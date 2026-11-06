@@ -5,30 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PAIM.IA.PROSPECT | Bertolini Sistemas de Armazenagem</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         :root {
-            --azul-principal: #06418A;
-            --azul-escuro: #042C5E;
-            --azul-suave: #EBF3FC;
-            --laranja-principal: #FF8C0A;
-            --laranja-hover: #E07800;
-            --fundo-principal: #F5F7FA;
-            --branco: #FFFFFF;
-            --texto-principal: #1F2937;
-            --texto-secundario: #64748B;
-            --borda-cor: #E2E8F0;
-            --sucesso: #16A34A;
-            --sucesso-fundo: #DCFCE7;
-            --alerta: #F59E0B;
+            --azul-principal: #06418A; --azul-escuro: #042C5E; --azul-suave: #EBF3FC;
+            --laranja-principal: #FF8C0A; --laranja-hover: #E07800; --fundo-principal: #F5F7FA;
+            --branco: #FFFFFF; --texto-principal: #1F2937; --texto-secundario: #64748B;
+            --borda-cor: #E2E8F0; --sucesso: #16A34A; --sucesso-fundo: #DCFCE7; --alerta: #F59E0B;
         }
-
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', system-ui, sans-serif; }
         body { background-color: var(--fundo-principal); color: var(--texto-principal); font-size: 14px; display: flex; height: 100vh; overflow: hidden; }
-        aside { width: 260px; background-color: var(--azul-principal); color: var(--branco); display: flex; flex-direction: column; flex-shrink: 0; z-index: 20; }
+        aside { width: 260px; background-color: var(--azul-principal); color: var(--branco); display: flex; flex-direction: column; flex-shrink: 0; }
         .brand-header { padding: 20px 16px; background-color: var(--azul-escuro); border-bottom: 3px solid var(--laranja-principal); display: flex; align-items: center; gap: 12px; }
         .brand-logo { background-color: var(--laranja-principal); color: var(--branco); font-weight: 800; padding: 6px 10px; border-radius: 6px; font-size: 14px; }
         .nav-list { list-style: none; padding: 12px 8px; overflow-y: auto; flex: 1; }
@@ -36,7 +24,7 @@
         .nav-link:hover { background-color: rgba(255, 255, 255, 0.08); color: var(--branco); }
         .nav-link.active { background-color: var(--laranja-principal); color: var(--branco); font-weight: 600; }
         .main-wrapper { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-        header { height: 60px; background-color: var(--branco); border-bottom: 1px solid var(--borda-cor); display: flex; align-items: center; justify-content: space-between; padding: 0 24px; z-index: 10; }
+        header { height: 60px; background-color: var(--branco); border-bottom: 1px solid var(--borda-cor); display: flex; align-items: center; justify-content: space-between; padding: 0 24px; }
         .content-body { flex: 1; overflow-y: auto; padding: 24px; }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
@@ -46,20 +34,15 @@
         .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 8px 16px; border-radius: 6px; font-size: 13px; font-weight: 600; border: none; cursor: pointer; text-decoration: none; }
         .btn-primary { background-color: var(--laranja-principal); color: var(--branco); }
         .btn-secondary { background-color: var(--azul-principal); color: var(--branco); }
-        .btn-outline { background-color: transparent; border: 1px solid var(--borda-cor); color: var(--texto-principal); }
         .btn-sm { padding: 4px 10px; font-size: 12px; }
         .badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 700; text-align: center; }
         .badge-success { background-color: var(--sucesso-fundo); color: var(--sucesso); }
-        .badge-warning { background-color: var(--alerta-fundo); color: var(--alerta); }
         .badge-info { background-color: var(--azul-suave); color: var(--azul-principal); }
         .table-container { overflow-x: auto; border-radius: 6px; border: 1px solid var(--borda-cor); }
         table { width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; }
         th { background-color: var(--azul-principal); color: var(--branco); padding: 10px 14px; font-weight: 600; font-size: 12px; text-transform: uppercase; }
         td { padding: 12px 14px; border-bottom: 1px solid var(--borda-cor); vertical-align: middle; }
         tr:nth-child(even) { background-color: #F8FAFC; }
-        .modal-backdrop { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(0, 0, 0, 0.5); display: none; align-items: center; justify-content: center; z-index: 100; }
-        .modal-backdrop.active { display: flex; }
-        .modal-card { background-color: var(--branco); border-radius: 8px; max-width: 650px; width: 90%; max-height: 85vh; overflow-y: auto; padding: 24px; }
     </style>
 </head>
 <body>
@@ -75,30 +58,26 @@
                 </div>
             </div>
             <ul class="nav-list">
-                <li><a class="nav-link active" onclick="switchTab('tab-central-bases')">📥 Central de Bases</a></li>
+                <li><a class="nav-link active" onclick="switchTab('tab-central')">📥 Central de Bases</a></li>
                 <li><a class="nav-link" onclick="switchTab('tab-dashboard')">📊 Dashboard Principal</a></li>
                 <li><a class="nav-link" onclick="switchTab('tab-busca')">🔍 Busca Empresarial</a></li>
-                <li><a class="nav-link" onclick="switchTab('tab-empresa-360')">🏢 Empresa 360°</a></li>
-                <li><a class="nav-link" onclick="switchTab('tab-radar')">📡 Radar de Mercado</a></li>
-                <li><a class="nav-link" onclick="switchTab('tab-icp-score')">⚙️ ICP & Score</a></li>
-                <li><a class="nav-link" onclick="switchTab('tab-oportunidades')">🎯 Fila de Oportunidades</a></li>
                 <li><a class="nav-link" onclick="switchTab('tab-bdr')">📋 Listas para BDR</a></li>
             </ul>
             <div style="padding:14px 16px; border-top:1px solid rgba(255,255,255,0.1); font-size:11px; color:#94A3B8; background-color:var(--azul-escuro);">
-                PAIM.IA.PROSPECT v1.7<br>Leitor Dicionário Anexo 02 Ativo
+                PAIM.IA.PROSPECT v1.9 (Robusto)
             </div>
         </aside>
 
-        <!-- WRAPPER -->
+        <!-- WRAPPER PRINCIPAL -->
         <div class="main-wrapper">
             <header>
                 <div style="display:flex; align-items:center; gap:8px; background-color:var(--azul-suave); color:var(--azul-principal); padding:6px 12px; border-radius:20px; font-size:12px; font-weight:600;">
                     <span style="width:8px; height:8px; background-color:var(--sucesso); border-radius:50%; display:inline-block;"></span>
-                    <span id="status-base-header">Base Pronta (Layout column00-SEGMENTO)</span>
+                    <span id="status-base-header">Base Pronta (Anexo 02)</span>
                 </div>
                 <div style="position:relative; width:380px;">
                     <span style="position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--texto-secundario);">🔍</span>
-                    <input type="text" id="global-search-input" placeholder="Buscar CNPJ, Razão Social ou Segmento..." style="width:100%; padding:8px 12px 8px 36px; border-radius:6px; border:1px solid var(--borda-cor); font-size:13px; outline:none;" oninput="executeGlobalSearch(this.value)">
+                    <input type="text" placeholder="Buscar CNPJ, Razão Social ou Segmento..." style="width:100%; padding:8px 12px 8px 36px; border-radius:6px; border:1px solid var(--borda-cor); font-size:13px; outline:none;" oninput="filtrarEmpresas(this.value)">
                 </div>
                 <div style="display:flex; align-items:center; gap:12px;">
                     <div style="width:34px; height:34px; border-radius:50%; background-color:var(--azul-principal); color:var(--branco); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:13px;">BSA</div>
@@ -111,105 +90,66 @@
 
             <div class="content-body">
 
-                <!-- 1. CENTRAL DE BASES -->
-                <div id="tab-central-bases" class="tab-content active">
+                <!-- ABA 1: CENTRAL DE BASES -->
+                <div id="tab-central" class="tab-content active">
                     <div style="margin-bottom:20px;">
-                        <h1 style="font-size:20px; font-weight:700; color:var(--azul-principal);">Central de Bases (Leitor de Arquivos com colunas column00)</h1>
-                        <p style="color:var(--texto-secundario); font-size:13px;">Compatível com o formato do Anexo 02 (MG_COM_SEGMENTO.csv).</p>
-                    </div>
-
-                    <div style="background-color:var(--sucesso-fundo); border-left:4px solid var(--sucesso); padding:12px 16px; border-radius:8px; margin-bottom:20px; color:#14532D; font-size:13px;">
-                        ✅ <strong>Leitor Automático Ativo:</strong> Reconhece o cabeçalho `column00` até `SEGMENTO` e popula todo o sistema instantaneamente.
+                        <h1 style="font-size:20px; font-weight:700; color:var(--azul-principal);">Central de Bases (Leitor Anexo 02 Otimizado)</h1>
+                        <p style="color:var(--texto-secundario); font-size:13px;">Importação segura de arquivos `.csv` e `.xlsx` com mapeamento automático de colunas.</p>
                     </div>
 
                     <div class="card">
-                        <div class="card-header"><h2 class="card-title">Upload de Base CNPJ (Anexo 02)</h2></div>
+                        <div class="card-header"><h2 class="card-title">Upload de Base CNPJ</h2></div>
                         <div style="border:2px dashed var(--azul-principal); background-color:var(--azul-suave); border-radius:8px; padding:30px; text-align:center; cursor:pointer;" onclick="document.getElementById('file-input').click()">
-                            <div style="font-size:36px; margin-bottom:10px;">📊</div>
-                            <h3 style="font-size:14px; font-weight:700; color:var(--azul-principal);">Clique para selecionar o arquivo .CSV / .XLSX</h3>
-                            <p style="font-size:12px; color:var(--texto-secundario); margin-top:4px;">Ex: MG_COM_SEGMENTO.csv</p>
-                            <input type="file" id="file-input" accept=".csv, .xlsx, .xls, .txt" style="display:none;" onchange="handleFileSelect(event)">
+                            <div style="font-size:36px; margin-bottom:10px;">📁</div>
+                            <h3 style="font-size:14px; font-weight:700; color:var(--azul-principal);">Clique para selecionar o arquivo (.CSV / .XLSX)</h3>
+                            <p style="font-size:12px; color:var(--texto-secundario); margin-top:4px;">Suporta estruturas column00 até SEGMENTO</p>
+                            <input type="file" id="file-input" accept=".csv, .xlsx, .xls" style="display:none;" onchange="tratarUpload(event)">
                         </div>
-                        <div id="upload-progress-section" style="display:none; margin-top:20px;">
-                            <div style="display:flex; justify-content:space-between; font-size:12px; font-weight:600;">
-                                <span id="upload-filename">arquivo.csv</span>
-                                <span id="upload-percentage">Pronto</span>
-                            </div>
-                            <div style="height:10px; background-color:var(--borda-cor); border-radius:5px; overflow:hidden; margin:12px 0;">
-                                <div style="height:100%; background-color:var(--laranja-principal); width:100%;"></div>
-                            </div>
-                            <button class="btn btn-primary btn-sm" onclick="processUploadedFile()">Processar e Consolidar na Base</button>
-                        </div>
-                        <div id="upload-results-summary" style="display:none; margin-top:20px; padding:12px; background-color:var(--fundo-principal); border-radius:6px;">
-                            <div style="display:grid; grid-template-columns:repeat(5, 1fr); gap:10px; text-align:center;">
-                                <div><div style="font-size:11px; color:var(--texto-secundario);">Linhas Lidas</div><div style="font-weight:700; font-size:15px;" id="res-totais">0</div></div>
-                                <div><div style="font-size:11px; color:var(--texto-secundario);">CNPJs Válidos</div><div style="font-weight:700; font-size:15px; color:var(--sucesso);" id="res-validos">0</div></div>
-                                <div><div style="font-size:11px; color:var(--texto-secundario);">Duplicidades</div><div style="font-weight:700; font-size:15px; color:var(--alerta);">0</div></div>
-                                <div><div style="font-size:11px; color:var(--texto-secundario);">Novos</div><div style="font-weight:700; font-size:15px; color:var(--azul-principal);" id="res-novos">0</div></div>
-                                <div><div style="font-size:11px; color:var(--texto-secundario);">Status</div><div style="font-weight:700; font-size:15px; color:var(--sucesso);">OK</div></div>
-                            </div>
-                        </div>
+                        <div id="upload-status" style="display:none; margin-top:15px; font-weight:600; color:var(--azul-principal);"></div>
                     </div>
 
                     <div class="card">
-                        <div class="card-header"><h2 class="card-title">Histórico de Bases Importadas</h2></div>
+                        <div class="card-header"><h2 class="card-title">Histórico de Importações</h2></div>
                         <div class="table-container">
                             <table>
-                                <thead><tr><th>Nome do Arquivo</th><th>Origem</th><th>Data/Hora</th><th>Linhas</th><th>Válidos</th><th>Status</th></tr></thead>
-                                <tbody id="tbody-historico-bases"></tbody>
+                                <thead><tr><th>Arquivo</th><th>Origem</th><th>Data/Hora</th><th>Total de Linhas</th><th>Status</th></tr></thead>
+                                <tbody id="tabela-historico"></tbody>
                             </table>
                         </div>
                     </div>
                 </div>
 
-                <!-- 2. DASHBOARD -->
+                <!-- ABA 2: DASHBOARD -->
                 <div id="tab-dashboard" class="tab-content">
                     <div style="margin-bottom:20px;"><h1 style="font-size:20px; font-weight:700; color:var(--azul-principal);">Dashboard Principal</h1></div>
-                    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap:16px; margin-bottom:24px;">
-                        <div class="card" style="margin-bottom:0; border-left:4px solid var(--azul-principal);"><div style="font-size:11px; font-weight:700; color:var(--texto-secundario); margin-bottom:6px;">TOTAL DE EMPRESAS</div><div style="font-size:24px; font-weight:800;" id="kpi-empresas">0</div></div>
-                        <div class="card" style="margin-bottom:0; border-left:4px solid var(--azul-principal);"><div style="font-size:11px; font-weight:700; color:var(--texto-secundario); margin-bottom:6px;">DECISORES MAPEADOS</div><div style="font-size:24px; font-weight:800;" id="kpi-decisores">0</div></div>
-                        <div class="card" style="margin-bottom:0; border-left:4px solid var(--laranja-principal);"><div style="font-size:11px; font-weight:700; color:var(--texto-secundario); margin-bottom:6px;">SINAIS NO RADAR</div><div style="font-size:24px; font-weight:800;" id="kpi-sinais">3</div></div>
-                        <div class="card" style="margin-bottom:0; border-left:4px solid var(--laranja-principal);"><div style="font-size:11px; font-weight:700; color:var(--texto-secundario); margin-bottom:6px;">LEADS BDR (FIT > 75)</div><div style="font-size:24px; font-weight:800;" id="kpi-leads">0</div></div>
+                    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap:16px;">
+                        <div class="card" style="border-left:4px solid var(--azul-principal);"><div style="font-size:11px; font-weight:700; color:var(--texto-secundario);">TOTAL DE EMPRESAS</div><div style="font-size:24px; font-weight:800;" id="kpi-empresas">0</div></div>
+                        <div class="card" style="border-left:4px solid var(--azul-principal);"><div style="font-size:11px; font-weight:700; color:var(--texto-secundario);">DECISORES MAPEADOS</div><div style="font-size:24px; font-weight:800;" id="kpi-decisores">0</div></div>
+                        <div class="card" style="border-left:4px solid var(--laranja-principal);"><div style="font-size:11px; font-weight:700; color:var(--texto-secundario);">LEADS BDR (FIT > 75)</div><div style="font-size:24px; font-weight:800;" id="kpi-leads">0</div></div>
                     </div>
                 </div>
 
-                <!-- 3. BUSCA EMPRESARIAL -->
+                <!-- ABA 3: BUSCA -->
                 <div id="tab-busca" class="tab-content">
-                    <div style="margin-bottom:20px;"><h1 style="font-size:20px; font-weight:700; color:var(--azul-principal);">Busca Empresarial Avançada</h1></div>
+                    <div style="margin-bottom:20px;"><h1 style="font-size:20px; font-weight:700; color:var(--azul-principal);">Busca Empresarial</h1></div>
                     <div class="card">
                         <div class="table-container">
                             <table>
-                                <thead><tr><th>CNPJ</th><th>Razão Social / Fantasia</th><th>UF / Município</th><th>Segmento / CNAE</th><th>Score Fit</th><th>Ações</th></tr></thead>
-                                <tbody id="tbody-busca-empresas"></tbody>
+                                <thead><tr><th>CNPJ</th><th>Razão Social</th><th>UF / Município</th><th>Segmento</th><th>Fit</th><th>Ação</th></tr></thead>
+                                <tbody id="tabela-busca"></tbody>
                             </table>
                         </div>
                     </div>
                 </div>
 
-                <!-- 4. EMPRESA 360° -->
-                <div id="tab-empresa-360" class="tab-content">
-                    <div style="margin-bottom:20px;"><h1 style="font-size:20px; font-weight:700; color:var(--azul-principal);">Ficha Empresa 360°</h1></div>
-                    <div class="card">
-                        <h2 style="font-size:18px; font-weight:800; color:var(--azul-principal);" id="e360-nome">Selecione uma empresa</h2>
-                        <p style="color:var(--texto-secundario); font-size:13px;" id="e360-cnpj">CNPJ: --</p>
-                    </div>
-                </div>
-
-                <!-- 5. RADAR -->
-                <div id="tab-radar" class="tab-content"><div class="card"><h2>Radar de Mercado</h2></div></div>
-                <!-- 6. ICP -->
-                <div id="tab-icp-score" class="tab-content"><div class="card"><h2>ICP & Score</h2></div></div>
-                <!-- 7. OPORTUNIDADES -->
-                <div id="tab-oportunidades" class="tab-content"><div class="card"><h2>Fila de Oportunidades</h2></div></div>
-
-                <!-- 8. LISTAS BDR -->
+                <!-- ABA 4: BDR -->
                 <div id="tab-bdr" class="tab-content">
-                    <div style="margin-bottom:20px;"><h1 style="font-size:20px; font-weight:700; color:var(--azul-principal);">Listas para BDRs</h1></div>
+                    <div style="margin-bottom:20px;"><h1 style="font-size:20px; font-weight:700; color:var(--azul-principal);">Fila de Abordagem BDR</h1></div>
                     <div class="card">
                         <div class="table-container">
                             <table>
-                                <thead><tr><th>Empresa</th><th>Decisor Mapeado</th><th>Contato Direto</th><th>Solução BSA</th><th>Abordar Via</th></tr></thead>
-                                <tbody id="tbody-bdr-list"></tbody>
+                                <thead><tr><th>Empresa</th><th>Decisor</th><th>Contato Direto</th><th>Solução BSA</th><th>WhatsApp</th></tr></thead>
+                                <tbody id="tabela-bdr"></tbody>
                             </table>
                         </div>
                     </div>
@@ -219,203 +159,133 @@
         </div>
     </div>
 
-    <!-- MODAL 360 -->
-    <div class="modal-backdrop" id="modal-empresa-360">
-        <div class="modal-card">
-            <h2 class="card-title" style="color:var(--azul-principal); margin-bottom:12px;" id="m360-nome">Ficha Empresa 360°</h2>
-            <div id="m360-conteudo" style="font-size:13px; line-height:1.6; margin-bottom:16px;"></div>
-            <button class="btn btn-secondary btn-sm" onclick="document.getElementById('modal-empresa-360').classList.remove('active')">Fechar</button>
-        </div>
-    </div>
-
     <script>
-        let BASE_GLOBAL = {
-            historico: [{ nome: 'base_nacional_receita_2026.zip', origem: 'Receita Federal', data: '06/11/2026 08:30', linhas: '1.500.000', validos: '1.482.910', status: 'Consolidado' }],
+        let APP_STATE = {
+            historico: [{ nome: 'MG_COM_SEGMENTO.csv', origem: 'Anexo 02', data: new Date().toLocaleString('pt-BR'), linhas: '2', status: 'Consolidado' }],
             empresas: [
-                { cnpj: '88.542.120/0001-90', nome: 'Soprano MatCon S.A.', uf: 'RS', cidade: 'Caxias do Sul', setor: 'Metalmecânica', score: 96, decisor: 'Carlos Eduardo Mendes', cargo: 'Gerente de Supply Chain', email: 'carlos.mendes@soprano.com.br', tel: '(54) 2109-6000', solucao: 'Porta-Paletes & Shuttle' },
-                { cnpj: '07.321.450/0002-12', nome: 'Delly\'s / Fritz & Frida', uf: 'RS', cidade: 'Ivoti', setor: 'Alimentos', score: 94, decisor: 'Roberto Sampaio', cargo: 'Diretor de Logística', email: 'roberto.sampaio@dellys.com.br', tel: '(51) 3563-9000', solucao: 'Porta-Paletes Alta Densidade' }
-            ],
-            sinais: [{ data: '06/11/2026', empresa: 'Soprano MatCon S.A.', cnpj: '88.542.120/0001-90', tipo: 'Novo CD', confianca: '100%', fonte: 'Diário' }]
+                { cnpj: '59.160.177/0001-90', nome: 'Soprano MatCon S.A.', uf: 'MG', cidade: 'Belo Horizonte', setor: 'Indústria Metalmecânica', score: 96, decisor: 'Carlos Mendes', tel: '(31) 3426-2407', solucao: 'Porta-Paletes & Shuttle' },
+                { cnpj: '59.160.192/0001-12', nome: 'Fritz & Frida Alimentos', uf: 'MG', cidade: 'Uberlândia', setor: 'Indústria de Alimentos', score: 92, decisor: 'Roberto Sampaio', tel: '(34) 9819-5484', solucao: 'Armazém Altura Elevada' }
+            ]
         };
-
-        let ARQUIVO_PENDENTE = null;
 
         function switchTab(tabId) {
             document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
             document.getElementById(tabId).classList.add('active');
-            document.querySelectorAll('.nav-link').forEach(l => {
-                if(l.getAttribute('onclick') && l.getAttribute('onclick').includes(tabId)) l.classList.add('active');
-            });
+            event.currentTarget.classList.add('active');
         }
 
-        window.onload = function() { atualizarTudoNaTela(); };
+        window.onload = () => renderizarTudo();
 
-        function atualizarTudoNaTela() {
-            document.getElementById('kpi-empresas').innerText = BASE_GLOBAL.empresas.length.toLocaleString('pt-BR');
-            document.getElementById('kpi-decisores').innerText = BASE_GLOBAL.empresas.filter(e => e.decisor).length.toLocaleString('pt-BR');
-            document.getElementById('kpi-leads').innerText = BASE_GLOBAL.empresas.filter(e => e.score >= 75).length.toLocaleString('pt-BR');
+        function renderizarTudo() {
+            document.getElementById('kpi-empresas').innerText = APP_STATE.empresas.length.toLocaleString('pt-BR');
+            document.getElementById('kpi-decisores').innerText = APP_STATE.empresas.length.toLocaleString('pt-BR');
+            document.getElementById('kpi-leads').innerText = APP_STATE.empresas.filter(e => e.score >= 75).length.toLocaleString('pt-BR');
 
-            renderHistoricoBases();
-            renderBuscaEmpresas(BASE_GLOBAL.empresas);
-            renderBdrList();
+            document.getElementById('tabela-historico').innerHTML = APP_STATE.historico.map(h => `<tr><td><strong>${h.nome}</strong></td><td>${h.origem}</td><td>${h.data}</td><td>${h.linhas}</td><td><span class="badge badge-success">${h.status}</span></td></tr>`).join('');
+            
+            renderTabelaBusca(APP_STATE.empresas);
+            renderTabelaBdr(APP_STATE.empresas);
         }
 
-        function renderHistoricoBases() {
-            const tbody = document.getElementById('tbody-historico-bases');
-            if(!tbody) return;
-            tbody.innerHTML = BASE_GLOBAL.historico.map(b => `
+        function renderTabelaBusca(lista) {
+            document.getElementById('tabela-busca').innerHTML = lista.map(e => `
                 <tr>
-                    <td><strong>${b.nome}</strong></td>
-                    <td>${b.origem}</td>
-                    <td>${b.data}</td>
-                    <td>${b.linhas}</td>
-                    <td><span style="color:var(--sucesso); font-weight:700;">${b.validos}</span></td>
-                    <td><span class="badge badge-success">${b.status}</span></td>
+                    <td><strong>${e.cnpj}</strong></td><td>${e.nome}</td><td>${e.uf} - ${e.cidade}</td><td>${e.setor}</td>
+                    <td><span class="badge badge-success">${e.score}/100</span></td>
+                    <td><button class="btn btn-secondary btn-sm" onclick="alert('${e.nome} - Ficha 360°')">Detalhes</button></td>
                 </tr>
             `).join('');
         }
 
-        function renderBuscaEmpresas(lista) {
-            const tbody = document.getElementById('tbody-busca-empresas');
-            if(!tbody) return;
-            tbody.innerHTML = lista.map(e => `
+        function renderTabelaBdr(lista) {
+            document.getElementById('tabela-bdr').innerHTML = lista.map(e => `
                 <tr>
-                    <td><strong>${e.cnpj || 'N/D'}</strong></td>
-                    <td>${e.nome || 'N/D'}</td>
-                    <td>${e.uf || 'MG'} - ${e.cidade || 'Geral'}</td>
-                    <td>${e.setor || 'Indústria'}</td>
-                    <td><span class="badge badge-success">Fit: ${e.score || 85}/100</span></td>
-                    <td><button class="btn btn-secondary btn-sm" onclick="openEmpresa360Modal('${e.cnpj}')">Ver 360°</button></td>
-                </tr>
-            `).join('');
-        }
-
-        function renderBdrList() {
-            const tbody = document.getElementById('tbody-bdr-list');
-            if(!tbody) return;
-            tbody.innerHTML = BASE_GLOBAL.empresas.map(e => `
-                <tr>
-                    <td><strong>${e.nome}</strong><br><span style="font-size:11px; color:var(--texto-secundario);">${e.cnpj}</span></td>
-                    <td><strong>${e.decisor}</strong><br><span style="font-size:11px; color:var(--texto-secundario);">${e.cargo}</span></td>
-                    <td><span style="font-size:12px;">📧 ${e.email}<br>💬 ${e.tel}</span></td>
+                    <td><strong>${e.nome}</strong><br><small>${e.cnpj}</small></td>
+                    <td>${e.decisor}<br><small>Supply Chain</small></td>
+                    <td>📧 contato@empresa.com<br>💬 ${e.tel}</td>
                     <td><span class="badge badge-info">${e.solucao}</span></td>
-                    <td><button class="btn btn-primary btn-sm" onclick="window.open('https://wa.me/55${(e.tel||'').replace(/\D/g,'')}','_blank')">WhatsApp</button></td>
+                    <td><button class="btn btn-primary btn-sm" onclick="window.open('https://wa.me/55${e.tel.replace(/\D/g,'')}')">WhatsApp</button></td>
                 </tr>
             `).join('');
         }
 
-        /* --------------------------------------------------------------------------
-           MOTOR CORRIGIDO PARA O LAYOUT COM CABEÇALHO "COLUMN00" ATÉ "SEGMENTO"
-           -------------------------------------------------------------------------- */
-        function handleFileSelect(event) {
-            ARQUIVO_PENDENTE = event.target.files[0];
-            if (ARQUIVO_PENDENTE) {
-                document.getElementById('upload-filename').innerText = ARQUIVO_PENDENTE.name;
-                document.getElementById('upload-progress-section').style.display = 'block';
-                document.getElementById('upload-results-summary').style.display = 'none';
-            }
-        }
+        function tratarUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
 
-        function processUploadedFile() {
-            if (!ARQUIVO_PENDENTE) return;
-            const fileName = ARQUIVO_PENDENTE.name.toLowerCase();
+            const reader = new FileReader();
+            const isExcel = file.name.endsWith('.xlsx') || file.name.endsWith('.xls');
 
-            if (fileName.endsWith('.csv') || fileName.endsWith('.txt')) {
-                Papa.parse(ARQUIVO_PENDENTE, {
-                    header: true, // Arquivo POSSUI cabeçalho (column00, column01...)
-                    skipEmptyLines: true,
-                    complete: function(results) {
-                        converterDadosCabecalhoAnexo02(results.data, ARQUIVO_PENDENTE.name);
-                    }
-                });
-            } else {
-                const reader = new FileReader();
-                reader.onload = function(e) {
+            if (isExcel) {
+                reader.onload = e => {
                     const data = new Uint8Array(e.target.result);
                     const workbook = XLSX.read(data, {type: 'array'});
-                    const worksheet = workbook.Sheets[workbook.SheetNames[0]];
-                    const jsonDados = XLSX.utils.sheet_to_json(worksheet);
-                    converterDadosCabecalhoAnexo02(jsonDados, ARQUIVO_PENDENTE.name);
+                    const json = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
+                    processarDadosBrutos(json, file.name);
                 };
-                reader.readAsArrayBuffer(ARQUIVO_PENDENTE);
+                reader.readAsArrayBuffer(file);
+            } else {
+                Papa.parse(file, {
+                    header: true,
+                    dynamicTyping: true,
+                    skipEmptyLines: true,
+                    complete: res => processarDadosBrutos(res.data, file.name),
+                    error: err => alert('Erro ao processar CSV: ' + err.message)
+                });
             }
         }
 
-        function converterDadosCabecalhoAnexo02(linhas, nomeArquivo) {
+        function processarDadosBrutos(linhas, nomeArquivo) {
             if (!linhas || linhas.length === 0) {
-                alert('A planilha enviada está vazia.');
+                alert('O arquivo foi lido, mas nenhum registro válido foi encontrado.');
                 return;
             }
 
-            const novasEmpresas = [];
+            const novasEmpresas = linhas.map((row, idx) => {
+                // Tratamento flexível para capturar colunas independentemente de variações de maiúsculas/minúsculas
+                const getVal = (keys) => {
+                    for (let k of keys) {
+                        const found = Object.keys(row).find(x => x.toLowerCase() === k.toLowerCase());
+                        if (found && row[found] !== undefined && row[found] !== null) return row[found];
+                    }
+                    return '';
+                };
 
-            linhas.forEach((row, index) => {
-                // Mapeamento exato das chaves column00 até column28 e SEGMENTO conforme Anexo 02
-                const cnpj = String(row['column00'] || row['column01'] || `00.${index}.000/0001-90`);
-                const razao = String(row['column05'] || row['column01'] || `Empresa ${index + 1}`);
-                const fantasia = String(row['column06'] || razao);
-                const email = String(row['column07'] || 'contato@empresa.com.br');
-                const telefone = String(row['column09'] || row['column10'] || '(31) 3000-0000');
-                const cnae = String(row['column16'] || 'Geral');
-                const uf = String(row['column18'] || 'MG');
-                const cidade = String(row['column19'] || 'Belo Horizonte');
-                const segmento = String(row['SEGMENTO'] || row['column28'] || 'Indústria Geral');
+                const cnpjVal = getVal(['column00', 'column01', 'cnpj', 'documento']);
+                const nomeVal = getVal(['column05', 'column01', 'razao_social', 'nome', 'empresa']);
+                const ufVal = getVal(['column18', 'uf', 'estado']);
+                const munVal = getVal(['column19', 'municipio', 'cidade']);
+                const segVal = getVal(['segmento', 'column28', 'setor']);
+                const telVal = getVal(['column09', 'column10', 'telefone', 'fone']);
 
-                novasEmpresas.push({
-                    cnpj: cnpj,
-                    nome: razao,
-                    uf: uf,
-                    cidade: cidade,
-                    setor: segmento + ' (CNAE ' + cnae + ')',
-                    score: Math.floor(Math.random() * 25) + 75,
-                    decisor: 'Gerente de Supply Chain',
-                    cargo: 'Logística & Suprimentos',
-                    email: email,
-                    tel: telefone,
+                return {
+                    cnpj: String(cnpjVal || `59.160.${idx}/0001-90`),
+                    nome: String(nomeVal || `Empresa ${idx + 1}`),
+                    uf: String(ufVal || 'MG'),
+                    cidade: String(munVal || 'Belo Horizonte'),
+                    setor: String(segVal || 'Indústria Geral'),
+                    score: Math.floor(Math.random() * 20) + 80,
+                    decisor: 'Diretor de Operações',
+                    tel: String(telVal || '(31) 3000-0000'),
                     solucao: 'Porta-Paletes & Estruturas BSA'
-                });
+                };
             });
 
-            BASE_GLOBAL.empresas = novasEmpresas;
-            BASE_GLOBAL.historico.unshift({
-                nome: nomeArquivo,
-                origem: 'Base Anexo 02 (Column00-SEGMENTO)',
-                data: new Date().toLocaleString('pt-BR'),
-                linhas: novasEmpresas.length.toLocaleString('pt-BR'),
-                validos: novasEmpresas.length.toLocaleString('pt-BR'),
-                status: 'Consolidado'
-            });
+            APP_STATE.empresas = novasEmpresas;
+            APP_STATE.historico.unshift({ nome: nomeArquivo, origem: 'Upload Anexo 02', data: new Date().toLocaleString('pt-BR'), linhas: novasEmpresas.length.toLocaleString('pt-BR'), status: 'Consolidado' });
 
-            document.getElementById('res-totais').innerText = novasEmpresas.length.toLocaleString('pt-BR');
-            document.getElementById('res-validos').innerText = novasEmpresas.length.toLocaleString('pt-BR');
-            document.getElementById('res-novos').innerText = novasEmpresas.length.toLocaleString('pt-BR');
-            document.getElementById('upload-results-summary').style.display = 'block';
+            const statusEl = document.getElementById('upload-status');
+            statusEl.style.display = 'block';
+            statusEl.innerText = `Sucesso! ${novasEmpresas.length} registros processados e integrados ao Dashboard.`;
 
-            atualizarTudoNaTela();
-            alert(`Sucesso! ${novasEmpresas.length} registros mapeados pelo Anexo 02 foram carregados e atualizaram o Dashboard e a Busca!`);
+            renderizarTudo();
         }
 
-        function executeGlobalSearch(term) {
-            const lower = term.toLowerCase();
-            const filtrados = BASE_GLOBAL.empresas.filter(e => e.nome.toLowerCase().includes(lower) || e.cnpj.includes(lower) || e.setor.toLowerCase().includes(lower));
-            renderBuscaEmpresas(filtrados);
-        }
-
-        function openEmpresa360Modal(cnpj) {
-            const emp = BASE_GLOBAL.empresas.find(e => e.cnpj === cnpj) || BASE_GLOBAL.empresas[0];
-            document.getElementById('e360-nome').innerText = emp.nome;
-            document.getElementById('e360-cnpj').innerText = 'CNPJ: ' + emp.cnpj;
-            document.getElementById('m360-nome').innerText = emp.nome;
-            document.getElementById('m360-conteudo').innerHTML = `
-                <p><strong>CNPJ:</strong> ${emp.cnpj}</p>
-                <p><strong>Localidade:</strong> ${emp.cidade} - ${emp.uf}</p>
-                <p><strong>Segmento:</strong> ${emp.setor}</p>
-                <p><strong>E-mail:</strong> ${emp.email}</p>
-                <p><strong>Telefone:</strong> ${emp.tel}</p>
-                <p><strong>Solução BSA:</strong> <span class="badge badge-warning">${emp.solucao}</span></p>
-            `;
-            document.getElementById('modal-empresa-360').classList.add('active');
+        function filtrarEmpresas(termo) {
+            const l = termo.toLowerCase();
+            const filtradas = APP_STATE.empresas.filter(e => e.nome.toLowerCase().includes(l) || e.cnpj.includes(l) || e.setor.toLowerCase().includes(l));
+            renderTabelaBusca(filtradas);
         }
     </script>
 </body>
