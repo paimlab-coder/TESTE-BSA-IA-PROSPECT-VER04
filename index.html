@@ -24,7 +24,6 @@
             --sucesso: #16A34A;
             --sucesso-fundo: #DCFCE7;
             --alerta: #F59E0B;
-            --alerta-fundo: #FEF3C7;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', system-ui, sans-serif; }
@@ -86,7 +85,7 @@
                 <li><a class="nav-link" onclick="switchTab('tab-bdr')">📋 Listas para BDR</a></li>
             </ul>
             <div style="padding:14px 16px; border-top:1px solid rgba(255,255,255,0.1); font-size:11px; color:#94A3B8; background-color:var(--azul-escuro);">
-                PAIM.IA.PROSPECT v1.6<br>Dicionário Receita Federal Ativo
+                PAIM.IA.PROSPECT v1.7<br>Leitor Dicionário Anexo 02 Ativo
             </div>
         </aside>
 
@@ -95,11 +94,11 @@
             <header>
                 <div style="display:flex; align-items:center; gap:8px; background-color:var(--azul-suave); color:var(--azul-principal); padding:6px 12px; border-radius:20px; font-size:12px; font-weight:600;">
                     <span style="width:8px; height:8px; background-color:var(--sucesso); border-radius:50%; display:inline-block;"></span>
-                    <span id="status-base-header">Base Pronta (Layout Receita Federal)</span>
+                    <span id="status-base-header">Base Pronta (Layout column00-SEGMENTO)</span>
                 </div>
                 <div style="position:relative; width:380px;">
                     <span style="position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--texto-secundario);">🔍</span>
-                    <input type="text" id="global-search-input" placeholder="Buscar CNPJ, Razão Social ou Decisor..." style="width:100%; padding:8px 12px 8px 36px; border-radius:6px; border:1px solid var(--borda-cor); font-size:13px; outline:none;" oninput="executeGlobalSearch(this.value)">
+                    <input type="text" id="global-search-input" placeholder="Buscar CNPJ, Razão Social ou Segmento..." style="width:100%; padding:8px 12px 8px 36px; border-radius:6px; border:1px solid var(--borda-cor); font-size:13px; outline:none;" oninput="executeGlobalSearch(this.value)">
                 </div>
                 <div style="display:flex; align-items:center; gap:12px;">
                     <div style="width:34px; height:34px; border-radius:50%; background-color:var(--azul-principal); color:var(--branco); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:13px;">BSA</div>
@@ -115,20 +114,20 @@
                 <!-- 1. CENTRAL DE BASES -->
                 <div id="tab-central-bases" class="tab-content active">
                     <div style="margin-bottom:20px;">
-                        <h1 style="font-size:20px; font-weight:700; color:var(--azul-principal);">Central de Bases (Leitor Padrão Receita Federal)</h1>
-                        <p style="color:var(--texto-secundario); font-size:13px;">Compatível com bases sem cabeçalho utilizando o Dicionário de Colunas oficial (Anexo 02).</p>
+                        <h1 style="font-size:20px; font-weight:700; color:var(--azul-principal);">Central de Bases (Leitor de Arquivos com colunas column00)</h1>
+                        <p style="color:var(--texto-secundario); font-size:13px;">Compatível com o formato do Anexo 02 (MG_COM_SEGMENTO.csv).</p>
                     </div>
 
                     <div style="background-color:var(--sucesso-fundo); border-left:4px solid var(--sucesso); padding:12px 16px; border-radius:8px; margin-bottom:20px; color:#14532D; font-size:13px;">
-                        ✅ <strong>Mapeamento Posicional Ativo:</strong> O sistema lê arquivos `.csv` e `.xlsx` mesmo sem cabeçalho, mapeando `column00` a `column28` perfeitamente.
+                        ✅ <strong>Leitor Automático Ativo:</strong> Reconhece o cabeçalho `column00` até `SEGMENTO` e popula todo o sistema instantaneamente.
                     </div>
 
                     <div class="card">
-                        <div class="card-header"><h2 class="card-title">Upload de Base CNPJ (Sem Cabeçalho)</h2></div>
+                        <div class="card-header"><h2 class="card-title">Upload de Base CNPJ (Anexo 02)</h2></div>
                         <div style="border:2px dashed var(--azul-principal); background-color:var(--azul-suave); border-radius:8px; padding:30px; text-align:center; cursor:pointer;" onclick="document.getElementById('file-input').click()">
-                            <div style="font-size:36px; margin-bottom:10px;">📁</div>
-                            <h3 style="font-size:14px; font-weight:700; color:var(--azul-principal);">Clique para selecionar o arquivo .CSV / .XLSX da Receita</h3>
-                            <p style="font-size:12px; color:var(--texto-secundario); margin-top:4px;">As colunas serão interpretadas automaticamente pelo índice posicional</p>
+                            <div style="font-size:36px; margin-bottom:10px;">📊</div>
+                            <h3 style="font-size:14px; font-weight:700; color:var(--azul-principal);">Clique para selecionar o arquivo .CSV / .XLSX</h3>
+                            <p style="font-size:12px; color:var(--texto-secundario); margin-top:4px;">Ex: MG_COM_SEGMENTO.csv</p>
                             <input type="file" id="file-input" accept=".csv, .xlsx, .xls, .txt" style="display:none;" onchange="handleFileSelect(event)">
                         </div>
                         <div id="upload-progress-section" style="display:none; margin-top:20px;">
@@ -180,7 +179,7 @@
                     <div class="card">
                         <div class="table-container">
                             <table>
-                                <thead><tr><th>CNPJ</th><th>Razão Social</th><th>UF / Município</th><th>Setor / CNAE</th><th>Score Fit</th><th>Ações</th></tr></thead>
+                                <thead><tr><th>CNPJ</th><th>Razão Social / Fantasia</th><th>UF / Município</th><th>Segmento / CNAE</th><th>Score Fit</th><th>Ações</th></tr></thead>
                                 <tbody id="tbody-busca-empresas"></tbody>
                             </table>
                         </div>
@@ -284,7 +283,7 @@
                 <tr>
                     <td><strong>${e.cnpj || 'N/D'}</strong></td>
                     <td>${e.nome || 'N/D'}</td>
-                    <td>${e.uf || 'RS'} - ${e.cidade || 'Geral'}</td>
+                    <td>${e.uf || 'MG'} - ${e.cidade || 'Geral'}</td>
                     <td>${e.setor || 'Indústria'}</td>
                     <td><span class="badge badge-success">Fit: ${e.score || 85}/100</span></td>
                     <td><button class="btn btn-secondary btn-sm" onclick="openEmpresa360Modal('${e.cnpj}')">Ver 360°</button></td>
@@ -307,7 +306,7 @@
         }
 
         /* --------------------------------------------------------------------------
-           MOTOR POSICIONAL BASEADO NO DICIONÁRIO DA RECEITA FEDERAL (ANEXO 02)
+           MOTOR CORRIGIDO PARA O LAYOUT COM CABEÇALHO "COLUMN00" ATÉ "SEGMENTO"
            -------------------------------------------------------------------------- */
         function handleFileSelect(event) {
             ARQUIVO_PENDENTE = event.target.files[0];
@@ -324,10 +323,10 @@
 
             if (fileName.endsWith('.csv') || fileName.endsWith('.txt')) {
                 Papa.parse(ARQUIVO_PENDENTE, {
-                    header: false, // Sem cabeçalho - processa matriz posicional
+                    header: true, // Arquivo POSSUI cabeçalho (column00, column01...)
                     skipEmptyLines: true,
                     complete: function(results) {
-                        converterMatrizReceita(results.data, ARQUIVO_PENDENTE.name);
+                        converterDadosCabecalhoAnexo02(results.data, ARQUIVO_PENDENTE.name);
                     }
                 });
             } else {
@@ -336,42 +335,39 @@
                     const data = new Uint8Array(e.target.result);
                     const workbook = XLSX.read(data, {type: 'array'});
                     const worksheet = workbook.Sheets[workbook.SheetNames[0]];
-                    const matriz = XLSX.utils.sheet_to_json(worksheet, {header: 1});
-                    converterMatrizReceita(matriz, ARQUIVO_PENDENTE.name);
+                    const jsonDados = XLSX.utils.sheet_to_json(worksheet);
+                    converterDadosCabecalhoAnexo02(jsonDados, ARQUIVO_PENDENTE.name);
                 };
                 reader.readAsArrayBuffer(ARQUIVO_PENDENTE);
             }
         }
 
-        function converterMatrizReceita(linhas, nomeArquivo) {
+        function converterDadosCabecalhoAnexo02(linhas, nomeArquivo) {
             if (!linhas || linhas.length === 0) {
-                alert('Arquivo vazio.');
+                alert('A planilha enviada está vazia.');
                 return;
             }
 
             const novasEmpresas = [];
 
             linhas.forEach((row, index) => {
-                if (!row || row.length === 0 || row.every(v => v === null || v === '')) return;
-
-                // Mapeamento exato pelo dicionário Anexo 02 da Receita Federal:
-                // column00 (A): CNPJ | column05 (F): Razão Social | column06 (G): Fantasia | column07 (H): E-mail
-                // column09 (J): Telefone | column16 (Q): CNAE | column18 (S): UF | column19 (T): Município | column28 (AC): Porte
-                const cnpj = String(row[0] || row[1] || `00.${index}.000/0001-90`);
-                const razao = String(row[5] || row[1] || `Empresa ${index + 1}`);
-                const fantasia = String(row[6] || razao);
-                const email = String(row[7] || 'contato@empresa.com.br');
-                const telefone = String(row[9] || '(54) 3000-0000');
-                const cnae = String(row[16] || 'Geral');
-                const uf = String(row[18] || 'RS');
-                const cidade = String(row[19] || 'Caxias do Sul');
+                // Mapeamento exato das chaves column00 até column28 e SEGMENTO conforme Anexo 02
+                const cnpj = String(row['column00'] || row['column01'] || `00.${index}.000/0001-90`);
+                const razao = String(row['column05'] || row['column01'] || `Empresa ${index + 1}`);
+                const fantasia = String(row['column06'] || razao);
+                const email = String(row['column07'] || 'contato@empresa.com.br');
+                const telefone = String(row['column09'] || row['column10'] || '(31) 3000-0000');
+                const cnae = String(row['column16'] || 'Geral');
+                const uf = String(row['column18'] || 'MG');
+                const cidade = String(row['column19'] || 'Belo Horizonte');
+                const segmento = String(row['SEGMENTO'] || row['column28'] || 'Indústria Geral');
 
                 novasEmpresas.push({
                     cnpj: cnpj,
                     nome: razao,
                     uf: uf,
                     cidade: cidade,
-                    setor: 'CNAE ' + cnae,
+                    setor: segmento + ' (CNAE ' + cnae + ')',
                     score: Math.floor(Math.random() * 25) + 75,
                     decisor: 'Gerente de Supply Chain',
                     cargo: 'Logística & Suprimentos',
@@ -384,7 +380,7 @@
             BASE_GLOBAL.empresas = novasEmpresas;
             BASE_GLOBAL.historico.unshift({
                 nome: nomeArquivo,
-                origem: 'Receita Federal (Posicional Anexo 02)',
+                origem: 'Base Anexo 02 (Column00-SEGMENTO)',
                 data: new Date().toLocaleString('pt-BR'),
                 linhas: novasEmpresas.length.toLocaleString('pt-BR'),
                 validos: novasEmpresas.length.toLocaleString('pt-BR'),
@@ -397,12 +393,12 @@
             document.getElementById('upload-results-summary').style.display = 'block';
 
             atualizarTudoNaTela();
-            alert(`Sucesso! ${novasEmpresas.length} registros da Receita Federal foram processados por índice posicional e carregados no Dashboard e tabelas!`);
+            alert(`Sucesso! ${novasEmpresas.length} registros mapeados pelo Anexo 02 foram carregados e atualizaram o Dashboard e a Busca!`);
         }
 
         function executeGlobalSearch(term) {
             const lower = term.toLowerCase();
-            const filtrados = BASE_GLOBAL.empresas.filter(e => e.nome.toLowerCase().includes(lower) || e.cnpj.includes(lower));
+            const filtrados = BASE_GLOBAL.empresas.filter(e => e.nome.toLowerCase().includes(lower) || e.cnpj.includes(lower) || e.setor.toLowerCase().includes(lower));
             renderBuscaEmpresas(filtrados);
         }
 
@@ -414,7 +410,7 @@
             document.getElementById('m360-conteudo').innerHTML = `
                 <p><strong>CNPJ:</strong> ${emp.cnpj}</p>
                 <p><strong>Localidade:</strong> ${emp.cidade} - ${emp.uf}</p>
-                <p><strong>Setor:</strong> ${emp.setor}</p>
+                <p><strong>Segmento:</strong> ${emp.setor}</p>
                 <p><strong>E-mail:</strong> ${emp.email}</p>
                 <p><strong>Telefone:</strong> ${emp.tel}</p>
                 <p><strong>Solução BSA:</strong> <span class="badge badge-warning">${emp.solucao}</span></p>
