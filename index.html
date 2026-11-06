@@ -525,7 +525,7 @@
             document.getElementById('kpi-leads').innerText = BASE_GLOBAL.empresas.filter(e => e.score >= 75).length.toLocaleString('pt-BR');
 
             renderHistoricoBases();
-            renderBuscaEmpresas(BASE_GLOBAL.empresas);
+            renderBuscaEmpresas(BASE_GLOBAL.empresas.slice(0, 300));
             renderRadarSinais();
             renderOportunidades();
             renderBdrList();
@@ -580,7 +580,7 @@
         function renderOportunidades() {
             const tbody = document.getElementById('tbody-oportunidades');
             if(!tbody) return;
-            tbody.innerHTML = BASE_GLOBAL.empresas.map(e => `
+            tbody.innerHTML = BASE_GLOBAL.empresas.slice(0, 300).map(e => `
                 <tr>
                     <td><strong>${e.nome}</strong></td>
                     <td>${e.uf || 'N/D'}</td>
@@ -595,7 +595,7 @@
         function renderBdrList() {
             const tbody = document.getElementById('tbody-bdr-list');
             if(!tbody) return;
-            tbody.innerHTML = BASE_GLOBAL.empresas.map(e => `
+            tbody.innerHTML = BASE_GLOBAL.empresas.slice(0, 300).map(e => `
                 <tr>
                     <td><strong>${e.nome}</strong><br><span style="font-size:11px; color:var(--texto-secundario);">${e.cnpj}</span></td>
                     <td><strong>${e.decisor || 'Não identificado'}</strong><br><span style="font-size:11px; color:var(--texto-secundario);">${e.cargo || 'Cargo não identificado'}</span></td>
@@ -1010,7 +1010,7 @@
 
                 barra.style.width = '75%';
                 status.innerText = 'Adaptando colunas e consolidando registros...';
-                converterEAtualizarBaseFlexivel(convertido.registros, arquivo.name, {
+                await converterEAtualizarBaseFlexivel(convertido.registros, arquivo.name, {
                     cabecalhos: convertido.cabecalhos,
                     indiceCabecalho: convertido.indiceCabecalho,
                     modo: convertido.modo,
@@ -1026,7 +1026,7 @@
             }
         }
 
-        function converterEAtualizarBaseFlexivel(dadosBrutos, nomeArquivo, diagnostico = {}) {
+        async function converterEAtualizarBaseFlexivel(dadosBrutos, nomeArquivo, diagnostico = {}) {
             const linhasPreenchidas = (dadosBrutos || []).filter(row => row && Object.values(row).some(valorPreenchido));
             if (!linhasPreenchidas.length) {
                 alert('O arquivo nao esta vazio, mas nenhuma linha preenchida foi localizada apos a leitura. Verifique cabecalho, delimitador e aba selecionada.');
@@ -1040,8 +1040,24 @@
             let semChaveContadores = 0;
             let duplicadosNoArquivo = 0;
             const chavesNoArquivo = new Set();
+            const indicePorCnpj = new Map();
+            const indicePorBasicoSemCnpj = new Map();
+            BASE_GLOBAL.empresas.forEach(e => {
+                const digitos = somenteDigitos(e.cnpj);
+                if (digitos) indicePorCnpj.set(digitos, e);
+                else if (e.cnpjBasico) indicePorBasicoSemCnpj.set(e.cnpjBasico, e);
+            });
+            const barraProgresso = document.getElementById('upload-progress-bar');
+            const textoProgresso = document.getElementById('upload-percentage');
 
-            linhasPreenchidas.forEach(row => {
+            for (let indiceLinha = 0; indiceLinha < linhasPreenchidas.length; indiceLinha++) {
+                const row = linhasPreenchidas[indiceLinha];
+                if (indiceLinha > 0 && indiceLinha % 2000 === 0) {
+                    const pct = 75 + Math.floor((indiceLinha / linhasPreenchidas.length) * 20);
+                    barraProgresso.style.width = Math.min(95, pct) + '%';
+                    textoProgresso.innerText = `Consolidando ${indiceLinha.toLocaleString('pt-BR')} de ${linhasPreenchidas.length.toLocaleString('pt-BR')} registros...`;
+                    await new Promise(resolve => setTimeout(resolve, 0));
+                }
                 const registro = extrairRegistroCanonico(row, layout);
                 const chave = registro.cnpjDigitos || (registro.cnpjBasico ? `BASE:${registro.cnpjBasico}` : '');
 
@@ -1053,9 +1069,9 @@
                 chavesNoArquivo.add(chave);
                 if (registro.cnpjDigitos && !registro.cnpjValido) invalidosContadores++;
 
-                let registroExistente = BASE_GLOBAL.empresas.find(e => somenteDigitos(e.cnpj) === registro.cnpjDigitos && registro.cnpjDigitos);
+                let registroExistente = registro.cnpjDigitos ? indicePorCnpj.get(registro.cnpjDigitos) : null;
                 if (!registroExistente && registro.cnpjBasico) {
-                    registroExistente = BASE_GLOBAL.empresas.find(e => e.cnpjBasico && e.cnpjBasico === registro.cnpjBasico && !registro.cnpjDigitos);
+                    registroExistente = indicePorBasicoSemCnpj.get(registro.cnpjBasico) || null;
                 }
 
                 if (registroExistente) {
@@ -1067,7 +1083,7 @@
                     registroExistente.origemImportacao = nomeArquivo;
                     atualizadosContadores++;
                 } else {
-                    BASE_GLOBAL.empresas.push({
+                    const novoRegistro = {
                         cnpj: registro.cnpj,
                         cnpjBasico: registro.cnpjBasico,
                         cnpjValido: registro.cnpjValido,
@@ -1093,10 +1109,13 @@
                         solucao: 'Pendente de qualificacao',
                         status: registro.cnpjValido ? 'Importado' : 'Requer validacao',
                         origemImportacao: nomeArquivo
-                    });
+                    };
+                    BASE_GLOBAL.empresas.push(novoRegistro);
+                    if (registro.cnpjDigitos) indicePorCnpj.set(registro.cnpjDigitos, novoRegistro);
+                    else if (registro.cnpjBasico) indicePorBasicoSemCnpj.set(registro.cnpjBasico, novoRegistro);
                     novosContadores++;
                 }
-            });
+            }
 
             const processados = novosContadores + atualizadosContadores;
             BASE_GLOBAL.historico.unshift({
@@ -1150,7 +1169,7 @@
                 (e.decisor && e.decisor.toLowerCase().includes(lower)) ||
                 (e.setor && e.setor.toLowerCase().includes(lower))
             );
-            renderBuscaEmpresas(filtrados);
+            renderBuscaEmpresas(filtrados.slice(0, 300));
         }
 
         function openEmpresa360Modal(cnpj) {
