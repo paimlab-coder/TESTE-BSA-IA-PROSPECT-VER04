@@ -286,7 +286,7 @@
                 <li class="nav-item"><a class="nav-link" onclick="switchTab('tab-config')">🔒 Configurações & Governança</a></li>
             </ul>
             <div style="padding:14px 16px; border-top:1px solid rgba(255,255,255,0.1); font-size:11px; color:#94A3B8; background-color:var(--azul-escuro);">
-                PAIM.IA.PROSPECT v2.0 REAL<br>Motor Adaptativo Anexo 02
+                PAIM.IA.PROSPECT v2.1 REAL<br>Motor Adaptativo Anexo 02
             </div>
         </aside>
 
@@ -886,23 +886,63 @@
             };
         }
 
-        function lerCSVComoMatriz(arquivo) {
-            return new Promise((resolve, reject) => {
-                Papa.parse(arquivo, {
-                    header: false,
-                    skipEmptyLines: 'greedy',
-                    dynamicTyping: false,
-                    transform: value => typeof value === 'string' ? value.replace(/^\uFEFF/, '').trim() : value,
-                    complete: results => {
-                        if (results.errors && results.errors.length && (!results.data || !results.data.length)) {
-                            reject(new Error(results.errors[0].message));
-                            return;
-                        }
-                        resolve(results.data || []);
-                    },
-                    error: err => reject(err)
-                });
+        function detectarDelimitadorCSV(texto) {
+            const linhas = String(texto || '').replace(/^\uFEFF/, '').split(/\r?\n/).filter(l => l.trim()).slice(0, 15);
+            const candidatos = [';', ',', '\t', '|'];
+            let melhor = ';';
+            let melhorPontuacao = -1;
+            candidatos.forEach(delim => {
+                const contagens = linhas.map(l => {
+                    let dentroAspas = false, qtd = 0;
+                    for (let i = 0; i < l.length; i++) {
+                        if (l[i] === '"') dentroAspas = !dentroAspas;
+                        else if (!dentroAspas && l.startsWith(delim, i)) qtd++;
+                    }
+                    return qtd;
+                }).filter(n => n > 0);
+                if (!contagens.length) return;
+                const freq = {};
+                contagens.forEach(n => freq[n] = (freq[n] || 0) + 1);
+                const moda = Number(Object.keys(freq).sort((a,b) => freq[b] - freq[a])[0]);
+                const consistentes = contagens.filter(n => n === moda).length;
+                const pontuacao = consistentes * 100 + moda;
+                if (pontuacao > melhorPontuacao) { melhorPontuacao = pontuacao; melhor = delim; }
             });
+            return melhor;
+        }
+
+        function lerArquivoComoTexto(arquivo) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(String(reader.result || ''));
+                reader.onerror = () => reject(new Error('Nao foi possivel ler o arquivo de texto.'));
+                reader.readAsText(arquivo, 'UTF-8');
+            });
+        }
+
+        async function lerCSVComoMatriz(arquivo) {
+            let texto = await lerArquivoComoTexto(arquivo);
+            if (!texto.trim()) throw new Error('O arquivo realmente nao possui conteudo de texto.');
+
+            // Remove BOM e NULs comuns em exportacoes de sistemas legados.
+            texto = texto.replace(/^\uFEFF/, '').replace(/\u0000/g, '');
+            const delimitador = detectarDelimitadorCSV(texto);
+
+            const resultado = Papa.parse(texto, {
+                delimiter: delimitador,
+                header: false,
+                skipEmptyLines: 'greedy',
+                dynamicTyping: false,
+                transform: value => typeof value === 'string' ? value.trim() : value
+            });
+
+            const dados = (resultado.data || []).filter(l => Array.isArray(l) && l.some(valorPreenchido));
+            if (!dados.length) {
+                throw new Error('O arquivo possui conteudo, mas nenhuma linha tabular foi identificada. Delimitador testado: ' + (delimitador === '\t' ? 'TAB' : delimitador));
+            }
+
+            // Avisos de autodeteccao ou formato irregular nao bloqueiam a carga quando ha dados utilizaveis.
+            return dados;
         }
 
         function lerExcelComoMatriz(arquivo) {
