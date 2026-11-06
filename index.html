@@ -554,9 +554,9 @@
                 <tr>
                     <td><strong>${e.cnpj || 'N/D'}</strong></td>
                     <td>${e.nome || 'N/D'}</td>
-                    <td>${e.uf || 'MG'} - ${e.cidade || 'Geral'}</td>
-                    <td>${e.setor || 'Indústria / Logística'}</td>
-                    <td><span class="badge badge-success">Fit: ${e.score || 85}/100</span></td>
+                    <td>${e.uf || 'N/D'} - ${e.cidade || 'N/D'}</td>
+                    <td>${e.setor || 'Não informado'}</td>
+                    <td><span class="badge badge-success">Fit: ${Number.isFinite(Number(e.score)) ? Number(e.score) : 0}/100</span></td>
                     <td><button class="btn btn-secondary btn-sm" onclick="openEmpresa360Modal('${e.cnpj}')">Ver 360°</button></td>
                 </tr>
             `).join('');
@@ -583,9 +583,9 @@
             tbody.innerHTML = BASE_GLOBAL.empresas.map(e => `
                 <tr>
                     <td><strong>${e.nome}</strong></td>
-                    <td>${e.uf || 'MG'}</td>
-                    <td><span class="badge badge-success">${e.score || 85}</span></td>
-                    <td><span class="badge badge-warning">${e.solucao || 'Porta-Paletes'}</span></td>
+                    <td>${e.uf || 'N/D'}</td>
+                    <td><span class="badge badge-success">${Number.isFinite(Number(e.score)) ? Number(e.score) : 0}</span></td>
+                    <td><span class="badge badge-warning">${e.solucao || 'Pendente de qualificação'}</span></td>
                     <td><span class="badge badge-info">${e.status || 'Novo'}</span></td>
                     <td><button class="btn btn-primary btn-sm" onclick="alert('Oportunidade Aprovada com Sucesso!')">Aprovar</button></td>
                 </tr>
@@ -598,156 +598,508 @@
             tbody.innerHTML = BASE_GLOBAL.empresas.map(e => `
                 <tr>
                     <td><strong>${e.nome}</strong><br><span style="font-size:11px; color:var(--texto-secundario);">${e.cnpj}</span></td>
-                    <td><strong>${e.decisor || 'Gerente de Supply Chain'}</strong><br><span style="font-size:11px; color:var(--texto-secundario);">${e.cargo || 'Logística & Suprimentos'}</span></td>
-                    <td><span style="font-size:12px;">📧 ${e.email || 'contato@empresa.com'}<br>💬 ${e.tel || '(31) 3000-0000'}</span></td>
-                    <td><span class="badge badge-info">${e.solucao || 'Armazenagem BSA'}</span></td>
+                    <td><strong>${e.decisor || 'Não identificado'}</strong><br><span style="font-size:11px; color:var(--texto-secundario);">${e.cargo || 'Cargo não identificado'}</span></td>
+                    <td><span style="font-size:12px;">📧 ${e.email || 'E-mail não informado'}<br>💬 ${e.tel || 'Telefone não informado'}</span></td>
+                    <td><span class="badge badge-info">${e.solucao || 'Pendente de qualificação'}</span></td>
                     <td><button class="btn btn-primary btn-sm" onclick="window.open('https://wa.me/55${(e.tel||'').replace(/\D/g,'')}','_blank')">WhatsApp</button></td>
                 </tr>
             `).join('');
         }
 
         /* --------------------------------------------------------------------------
-           MOTOR ADAPTATIVO: DESCONSIDERA O QUE FALTAR E FAZ PROCX / DE-PARA NO ENRIQUECIMENTO
+           MOTOR ADAPTATIVO DE IMPORTACAO
+           - Le CSV/TXT com virgula, ponto e virgula, tabulacao ou pipe
+           - Le XLS/XLSX mesmo com cabecalho fora da primeira linha
+           - Reconhece nomes de colunas diferentes entre estados
+           - Reconhece colunas genericas column00, column01 etc.
+           - Adapta arquivos da Receita: Empresas, Estabelecimentos e bases combinadas
+           - Nao inventa CNPJ, empresa, cidade, contato ou score
            -------------------------------------------------------------------------- */
         function handleFileSelect(event) {
             ARQUIVO_PENDENTE = event.target.files[0];
             if (ARQUIVO_PENDENTE) {
                 document.getElementById('upload-filename').innerText = ARQUIVO_PENDENTE.name;
-                document.getElementById('upload-percentage').innerText = 'Arquivo pronto para análise';
+                document.getElementById('upload-percentage').innerText = 'Arquivo pronto para analise';
                 document.getElementById('upload-progress-section').style.display = 'block';
                 document.getElementById('upload-results-summary').style.display = 'none';
             }
         }
 
-        function processUploadedFile() {
+        function normalizarTexto(valor) {
+            return String(valor == null ? '' : valor)
+                .replace(/^\uFEFF/, '')
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .toLowerCase()
+                .replace(/[^a-z0-9]/g, '');
+        }
+
+        function valorPreenchido(valor) {
+            return valor !== undefined && valor !== null && String(valor).trim() !== '';
+        }
+
+        function somenteDigitos(valor) {
+            return String(valor == null ? '' : valor).replace(/\D/g, '');
+        }
+
+        function formatarCNPJ(valor) {
+            const d = somenteDigitos(valor).padStart(14, '0');
+            if (d.length !== 14) return '';
+            return d.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/, '$1.$2.$3/$4-$5');
+        }
+
+        function validarCNPJ(valor) {
+            const cnpj = somenteDigitos(valor);
+            if (cnpj.length !== 14 || /^(\d)\1{13}$/.test(cnpj)) return false;
+            const calcular = (base, pesos) => {
+                const soma = base.split('').reduce((acc, n, i) => acc + Number(n) * pesos[i], 0);
+                const resto = soma % 11;
+                return resto < 2 ? 0 : 11 - resto;
+            };
+            const d1 = calcular(cnpj.slice(0, 12), [5,4,3,2,9,8,7,6,5,4,3,2]);
+            const d2 = calcular(cnpj.slice(0, 12) + d1, [6,5,4,3,2,9,8,7,6,5,4,3,2]);
+            return cnpj.endsWith(String(d1) + String(d2));
+        }
+
+        const DICIONARIO_RECEITA = {
+            cnpj: ['cnpj', 'cnpjcompleto', 'numerocnpj', 'documento', 'cnpjcpf', 'inscricaocnpj'],
+            cnpjBasico: ['cnpjbasico', 'cnpjbase', 'raizcnpj', 'basico'],
+            ordem: ['cnpjordem', 'ordem', 'ordemestabelecimento', 'filial'],
+            dv: ['cnpjdv', 'dv', 'digitoverificador', 'digito'],
+            razao: ['razaosocial', 'razao', 'nomeempresarial', 'nomerazao', 'empresa', 'nomeempresa'],
+            fantasia: ['nomefantasia', 'fantasia', 'nometituloestabelecimento', 'tituloestabelecimento'],
+            uf: ['uf', 'estado', 'siglauf', 'unidadefederativa'],
+            cidade: ['municipio', 'cidade', 'nomemunicipio', 'municipionome', 'localidade'],
+            municipioCodigo: ['codigomunicipio', 'codmunicipio', 'municipiocodigo'],
+            cnae: ['cnae', 'cnaeprincipal', 'cnaefiscalprincipal', 'codigocnae', 'atividadeprincipal'],
+            segmento: ['segmento', 'setor', 'ramo', 'atividade', 'descricaoatividade', 'descricaocnae'],
+            email: ['email', 'emailcorporativo', 'correioeletronico', 'emailestabelecimento'],
+            telefone: ['telefone', 'telefone1', 'tel', 'fone', 'contato', 'telefonestabelecimento'],
+            ddd1: ['ddd1', 'dddtelefone1', 'ddd'],
+            telefone1: ['telefone1', 'numero1', 'fone1'],
+            ddd2: ['ddd2', 'dddtelefone2'],
+            telefone2: ['telefone2', 'numero2', 'fone2'],
+            matrizFilial: ['identificadormatrizfilial', 'matrizfilial', 'tipoestabelecimento'],
+            situacao: ['situacaocadastral', 'situacao', 'statuscadastral'],
+            porte: ['porte', 'porteempresa'],
+            capital: ['capitalsocial', 'capital'],
+            cep: ['cep', 'codigocep'],
+            dataAbertura: ['datainicioatividade', 'dataabertura', 'inicioatividade']
+        };
+
+        function todasAliasesNormalizadas() {
+            const set = new Set();
+            Object.values(DICIONARIO_RECEITA).flat().forEach(v => set.add(normalizarTexto(v)));
+            return set;
+        }
+
+        function pontuarLinhaCabecalho(linha) {
+            if (!Array.isArray(linha)) return 0;
+            const aliases = todasAliasesNormalizadas();
+            let pontos = 0;
+            linha.forEach(celula => {
+                const n = normalizarTexto(celula);
+                if (!n) return;
+                if (aliases.has(n)) pontos += 5;
+                if (/^column\d+$/.test(n)) pontos += 2;
+                if (n.includes('cnpj')) pontos += 4;
+                if (n.includes('razao') || n.includes('fantasia')) pontos += 3;
+                if (n === 'uf' || n.includes('municipio')) pontos += 2;
+            });
+            return pontos;
+        }
+
+        function localizarCabecalho(matriz) {
+            const limite = Math.min(matriz.length, 30);
+            let melhorIndice = -1;
+            let melhorPontuacao = 0;
+            for (let i = 0; i < limite; i++) {
+                const pontos = pontuarLinhaCabecalho(matriz[i]);
+                if (pontos > melhorPontuacao) {
+                    melhorPontuacao = pontos;
+                    melhorIndice = i;
+                }
+            }
+            return melhorPontuacao >= 4 ? melhorIndice : -1;
+        }
+
+        function tornarCabecalhosUnicos(cabecalhos) {
+            const usados = {};
+            return cabecalhos.map((h, i) => {
+                let base = String(h == null ? '' : h).trim() || `column${String(i).padStart(2, '0')}`;
+                if (!usados[base]) {
+                    usados[base] = 1;
+                    return base;
+                }
+                usados[base] += 1;
+                return `${base}_${usados[base]}`;
+            });
+        }
+
+        function matrizParaObjetos(matriz) {
+            const linhas = (matriz || []).filter(linha => Array.isArray(linha) && linha.some(valorPreenchido));
+            if (!linhas.length) return { registros: [], cabecalhos: [], indiceCabecalho: -1, modo: 'sem-dados' };
+
+            const indiceCabecalho = localizarCabecalho(linhas);
+            let cabecalhos;
+            let inicioDados;
+            let modo;
+
+            if (indiceCabecalho >= 0) {
+                cabecalhos = tornarCabecalhosUnicos(linhas[indiceCabecalho]);
+                inicioDados = indiceCabecalho + 1;
+                modo = 'cabecalho-detectado';
+            } else {
+                const maiorLargura = Math.max(...linhas.map(l => l.length));
+                cabecalhos = Array.from({length: maiorLargura}, (_, i) => `column${String(i).padStart(2, '0')}`);
+                inicioDados = 0;
+                modo = 'posicional-sem-cabecalho';
+            }
+
+            const registros = linhas.slice(inicioDados).map(linha => {
+                const obj = {};
+                cabecalhos.forEach((h, i) => { obj[h] = linha[i] == null ? '' : linha[i]; });
+                return obj;
+            }).filter(obj => Object.values(obj).some(valorPreenchido));
+
+            return { registros, cabecalhos, indiceCabecalho, modo };
+        }
+
+        function objetoParaMapaNormalizado(row) {
+            const mapa = {};
+            Object.keys(row || {}).forEach(chave => {
+                const n = normalizarTexto(chave);
+                if (n && mapa[n] === undefined && valorPreenchido(row[chave])) mapa[n] = row[chave];
+            });
+            return mapa;
+        }
+
+        function obterPorAliases(row, campo) {
+            const mapa = objetoParaMapaNormalizado(row);
+            for (const alias of DICIONARIO_RECEITA[campo] || []) {
+                const n = normalizarTexto(alias);
+                if (valorPreenchido(mapa[n])) return String(mapa[n]).trim();
+            }
+            return '';
+        }
+
+        function obterPorPosicao(row, indice) {
+            const chaves = [`column${String(indice).padStart(2, '0')}`, `column${indice}`];
+            for (const chave of chaves) {
+                if (valorPreenchido(row[chave])) return String(row[chave]).trim();
+            }
+            return '';
+        }
+
+        function detectarLayoutReceita(cabecalhos, registros) {
+            const norm = (cabecalhos || []).map(normalizarTexto);
+            const tem = termo => norm.some(h => h.includes(termo));
+            if (tem('cnpjbasico') && (tem('nomefantasia') || tem('situacaocadastral') || tem('cnaefiscalprincipal'))) return 'estabelecimentos-nomeado';
+            if (tem('cnpjbasico') && (tem('razaosocial') || tem('capitalsocial') || tem('porte'))) return 'empresas-nomeado';
+            if (norm.some(h => /^column\d+$/.test(h))) {
+                const amostra = registros.slice(0, 20);
+                const col0Oito = amostra.filter(r => somenteDigitos(obterPorPosicao(r, 0)).length === 8).length;
+                const col1Quatro = amostra.filter(r => somenteDigitos(obterPorPosicao(r, 1)).length <= 4 && somenteDigitos(obterPorPosicao(r, 1)).length > 0).length;
+                const col2Dois = amostra.filter(r => somenteDigitos(obterPorPosicao(r, 2)).length <= 2 && somenteDigitos(obterPorPosicao(r, 2)).length > 0).length;
+                if (col0Oito >= Math.max(1, Math.floor(amostra.length * 0.4)) && col1Quatro && col2Dois) return 'estabelecimentos-posicional';
+                if (col0Oito >= Math.max(1, Math.floor(amostra.length * 0.4))) return 'empresas-posicional';
+            }
+            return 'flexivel';
+        }
+
+        function extrairRegistroCanonico(row, layout) {
+            let cnpj = obterPorAliases(row, 'cnpj');
+            let cnpjBasico = obterPorAliases(row, 'cnpjBasico');
+            let ordem = obterPorAliases(row, 'ordem');
+            let dv = obterPorAliases(row, 'dv');
+            let razao = obterPorAliases(row, 'razao');
+            let fantasia = obterPorAliases(row, 'fantasia');
+            let uf = obterPorAliases(row, 'uf');
+            let cidade = obterPorAliases(row, 'cidade');
+            let municipioCodigo = obterPorAliases(row, 'municipioCodigo');
+            let cnae = obterPorAliases(row, 'cnae');
+            let segmento = obterPorAliases(row, 'segmento');
+            let email = obterPorAliases(row, 'email');
+            let telefone = obterPorAliases(row, 'telefone');
+            let matrizFilial = obterPorAliases(row, 'matrizFilial');
+            let situacao = obterPorAliases(row, 'situacao');
+            let porte = obterPorAliases(row, 'porte');
+            let capital = obterPorAliases(row, 'capital');
+            let cep = obterPorAliases(row, 'cep');
+            let dataAbertura = obterPorAliases(row, 'dataAbertura');
+
+            if (layout === 'estabelecimentos-posicional') {
+                cnpjBasico ||= obterPorPosicao(row, 0);
+                ordem ||= obterPorPosicao(row, 1);
+                dv ||= obterPorPosicao(row, 2);
+                matrizFilial ||= obterPorPosicao(row, 3);
+                fantasia ||= obterPorPosicao(row, 4);
+                situacao ||= obterPorPosicao(row, 5);
+                dataAbertura ||= obterPorPosicao(row, 10);
+                cnae ||= obterPorPosicao(row, 11);
+                cep ||= obterPorPosicao(row, 18);
+                uf ||= obterPorPosicao(row, 19);
+                municipioCodigo ||= obterPorPosicao(row, 20);
+                const ddd = obterPorPosicao(row, 21);
+                const tel = obterPorPosicao(row, 22);
+                telefone ||= [ddd, tel].filter(Boolean).join(' ');
+                email ||= obterPorPosicao(row, 27);
+            } else if (layout === 'empresas-posicional') {
+                cnpjBasico ||= obterPorPosicao(row, 0);
+                razao ||= obterPorPosicao(row, 1);
+                capital ||= obterPorPosicao(row, 4);
+                porte ||= obterPorPosicao(row, 5);
+            }
+
+            if (!cnpj && cnpjBasico && ordem && dv) {
+                const completo = somenteDigitos(cnpjBasico).padStart(8, '0') + somenteDigitos(ordem).padStart(4, '0') + somenteDigitos(dv).padStart(2, '0');
+                if (completo.length === 14) cnpj = completo;
+            }
+
+            const cnpjDigitos = somenteDigitos(cnpj);
+            const cnpjFormatado = cnpjDigitos.length === 14 ? formatarCNPJ(cnpjDigitos) : '';
+            const nome = razao || fantasia;
+            const setor = segmento || cnae;
+
+            return {
+                cnpj: cnpjFormatado,
+                cnpjDigitos,
+                cnpjValido: cnpjDigitos.length === 14 && validarCNPJ(cnpjDigitos),
+                cnpjBasico: somenteDigitos(cnpjBasico).padStart(cnpjBasico ? 8 : 0, '0'),
+                nome,
+                razao,
+                fantasia,
+                uf: String(uf || '').trim().toUpperCase(),
+                cidade,
+                municipioCodigo,
+                cnae,
+                setor,
+                email,
+                tel: telefone,
+                matrizFilial,
+                situacao,
+                porte,
+                capital,
+                cep,
+                dataAbertura,
+                dadosOriginais: row
+            };
+        }
+
+        function lerCSVComoMatriz(arquivo) {
+            return new Promise((resolve, reject) => {
+                Papa.parse(arquivo, {
+                    header: false,
+                    skipEmptyLines: 'greedy',
+                    dynamicTyping: false,
+                    transform: value => typeof value === 'string' ? value.replace(/^\uFEFF/, '').trim() : value,
+                    complete: results => {
+                        if (results.errors && results.errors.length && (!results.data || !results.data.length)) {
+                            reject(new Error(results.errors[0].message));
+                            return;
+                        }
+                        resolve(results.data || []);
+                    },
+                    error: err => reject(err)
+                });
+            });
+        }
+
+        function lerExcelComoMatriz(arquivo) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const data = new Uint8Array(e.target.result);
+                        const workbook = XLSX.read(data, {type: 'array', cellDates: false, raw: false});
+                        let melhor = [];
+                        let melhorAba = '';
+                        workbook.SheetNames.forEach(nomeAba => {
+                            const matriz = XLSX.utils.sheet_to_json(workbook.Sheets[nomeAba], {header: 1, defval: '', raw: false, blankrows: false});
+                            const preenchidas = matriz.filter(l => Array.isArray(l) && l.some(valorPreenchido));
+                            if (preenchidas.length > melhor.length) {
+                                melhor = preenchidas;
+                                melhorAba = nomeAba;
+                            }
+                        });
+                        resolve({matriz: melhor, aba: melhorAba});
+                    } catch (error) {
+                        reject(error);
+                    }
+                };
+                reader.onerror = () => reject(new Error('Nao foi possivel acessar o arquivo Excel.'));
+                reader.readAsArrayBuffer(arquivo);
+            });
+        }
+
+        async function processUploadedFile() {
             if (!ARQUIVO_PENDENTE) {
                 alert('Nenhum arquivo selecionado.');
                 return;
             }
 
-            const fileName = ARQUIVO_PENDENTE.name.toLowerCase();
+            const arquivo = ARQUIVO_PENDENTE;
+            const fileName = arquivo.name.toLowerCase();
+            const status = document.getElementById('upload-percentage');
+            const barra = document.getElementById('upload-progress-bar');
+            status.innerText = 'Lendo o arquivo...';
+            barra.style.width = '25%';
 
-            if (fileName.endsWith('.csv') || fileName.endsWith('.txt')) {
-                Papa.parse(ARQUIVO_PENDENTE, {
-                    header: true,
-                    skipEmptyLines: true,
-                    complete: function(results) {
-                        converterEAtualizarBaseFlexivel(results.data, ARQUIVO_PENDENTE.name);
-                    },
-                    error: function(err) {
-                        alert('Erro ao ler arquivo CSV: ' + err.message);
-                    }
+            try {
+                let matriz = [];
+                let detalheOrigem = '';
+
+                if (fileName.endsWith('.csv') || fileName.endsWith('.txt')) {
+                    matriz = await lerCSVComoMatriz(arquivo);
+                    detalheOrigem = 'CSV/TXT';
+                } else if (fileName.endsWith('.xlsx') || fileName.endsWith('.xls')) {
+                    const excel = await lerExcelComoMatriz(arquivo);
+                    matriz = excel.matriz;
+                    detalheOrigem = `Excel - aba ${excel.aba || 'principal'}`;
+                } else {
+                    throw new Error('Formato nao suportado. Envie CSV, TXT, XLS ou XLSX.');
+                }
+
+                barra.style.width = '55%';
+                status.innerText = 'Detectando cabecalhos e dicionario da Receita...';
+
+                const convertido = matrizParaObjetos(matriz);
+                if (!convertido.registros.length) {
+                    throw new Error('O arquivo foi lido, mas nao possui linhas de dados preenchidas. Verifique se a planilha tem pelo menos uma linha alem do cabecalho.');
+                }
+
+                barra.style.width = '75%';
+                status.innerText = 'Adaptando colunas e consolidando registros...';
+                converterEAtualizarBaseFlexivel(convertido.registros, arquivo.name, {
+                    cabecalhos: convertido.cabecalhos,
+                    indiceCabecalho: convertido.indiceCabecalho,
+                    modo: convertido.modo,
+                    detalheOrigem
                 });
-            } else if (fileName.endsWith('.xlsx') || fileName.endsWith('.xls')) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    try {
-                        const data = new Uint8Array(e.target.result);
-                        const workbook = XLSX.read(data, {type: 'array'});
-                        const worksheet = workbook.Sheets[workbook.SheetNames[0]];
-                        const jsonDados = XLSX.utils.sheet_to_json(worksheet);
-                        converterEAtualizarBaseFlexivel(jsonDados, ARQUIVO_PENDENTE.name);
-                    } catch (error) {
-                        alert('Erro ao ler arquivo Excel: ' + error.message);
-                    }
-                };
-                reader.readAsArrayBuffer(ARQUIVO_PENDENTE);
-            } else {
-                alert('Formato não suportado. Por favor, envie um arquivo .CSV ou .XLSX');
+
+                barra.style.width = '100%';
+                status.innerText = 'Importacao concluida';
+            } catch (error) {
+                barra.style.width = '0%';
+                status.innerText = 'Falha na importacao';
+                alert('Nao foi possivel importar o arquivo. ' + error.message);
             }
         }
 
-        function converterEAtualizarBaseFlexivel(dadosBrutos, nomeArquivo) {
-            if (!dadosBrutos || dadosBrutos.length === 0) {
-                alert('A planilha enviada está vazia.');
+        function converterEAtualizarBaseFlexivel(dadosBrutos, nomeArquivo, diagnostico = {}) {
+            const linhasPreenchidas = (dadosBrutos || []).filter(row => row && Object.values(row).some(valorPreenchido));
+            if (!linhasPreenchidas.length) {
+                alert('O arquivo nao esta vazio, mas nenhuma linha preenchida foi localizada apos a leitura. Verifique cabecalho, delimitador e aba selecionada.');
                 return;
             }
 
+            const layout = detectarLayoutReceita(diagnostico.cabecalhos || Object.keys(linhasPreenchidas[0] || {}), linhasPreenchidas);
             let novosContadores = 0;
             let atualizadosContadores = 0;
+            let invalidosContadores = 0;
+            let semChaveContadores = 0;
+            let duplicadosNoArquivo = 0;
+            const chavesNoArquivo = new Set();
 
-            dadosBrutos.forEach((row, index) => {
-                const getVal = (possiveisChaves) => {
-                    const keys = Object.keys(row);
-                    for (let p of possiveisChaves) {
-                        const k = keys.find(item => item.toLowerCase() === p.toLowerCase());
-                        if (k && row[k] !== undefined && row[k] !== null && String(row[k]).trim() !== '') {
-                            return String(row[k]).trim();
-                        }
-                    }
-                    return null;
-                };
+            linhasPreenchidas.forEach(row => {
+                const registro = extrairRegistroCanonico(row, layout);
+                const chave = registro.cnpjDigitos || (registro.cnpjBasico ? `BASE:${registro.cnpjBasico}` : '');
 
-                // Mapeamento Flexível pelas colunas do Anexo 02 ou Nomeadas
-                const cnpjLido = getVal(['column00', 'column01', 'cnpj', 'documento']) || `59.160.${index}/0001-90`;
-                const nomeLido = getVal(['column05', 'column01', 'razao', 'nome', 'empresa']);
-                const ufLido = getVal(['column18', 'uf', 'estado']);
-                const cidadeLida = getVal(['column19', 'municipio', 'cidade']);
-                const segmentoLido = getVal(['segmento', 'column28', 'cnae', 'setor']);
-                const emailLido = getVal(['column07', 'email', 'e-mail']);
-                const telLido = getVal(['column09', 'column10', 'telefone', 'tel', 'fone']);
+                if (!chave) {
+                    semChaveContadores++;
+                    return;
+                }
+                if (chavesNoArquivo.has(chave)) duplicadosNoArquivo++;
+                chavesNoArquivo.add(chave);
+                if (registro.cnpjDigitos && !registro.cnpjValido) invalidosContadores++;
 
-                // Procura se o CNPJ já existe na base (Lógica PROCX / De-Para)
-                let registroExistente = BASE_GLOBAL.empresas.find(e => e.cnpj === cnpjLido);
+                let registroExistente = BASE_GLOBAL.empresas.find(e => somenteDigitos(e.cnpj) === registro.cnpjDigitos && registro.cnpjDigitos);
+                if (!registroExistente && registro.cnpjBasico) {
+                    registroExistente = BASE_GLOBAL.empresas.find(e => e.cnpjBasico && e.cnpjBasico === registro.cnpjBasico && !registro.cnpjDigitos);
+                }
 
                 if (registroExistente) {
-                    // Atualiza incrementalmente APENAS o que o novo arquivo trouxer
-                    if (nomeLido) registroExistente.nome = nomeLido;
-                    if (ufLido) registroExistente.uf = ufLido;
-                    if (cidadeLida) registroExistente.cidade = cidadeLida;
-                    if (segmentoLido) registroExistente.setor = segmentoLido;
-                    if (emailLido) registroExistente.email = emailLido;
-                    if (telLido) registroExistente.tel = telLido;
+                    const campos = ['cnpj', 'cnpjBasico', 'nome', 'razao', 'fantasia', 'uf', 'cidade', 'municipioCodigo', 'cnae', 'setor', 'email', 'tel', 'matrizFilial', 'situacao', 'porte', 'capital', 'cep', 'dataAbertura'];
+                    campos.forEach(campo => {
+                        if (valorPreenchido(registro[campo])) registroExistente[campo] = registro[campo];
+                    });
+                    registroExistente.cnpjValido = registro.cnpjValido;
+                    registroExistente.origemImportacao = nomeArquivo;
                     atualizadosContadores++;
                 } else {
-                    // Cria novo registro preenchendo o que tiver e deixando o resto seguro
                     BASE_GLOBAL.empresas.push({
-                        cnpj: cnpjLido,
-                        nome: nomeLido || `Empresa ${index + 1}`,
-                        uf: ufLido || 'MG',
-                        cidade: cidadeLida || 'Belo Horizonte',
-                        setor: segmentoLido || 'Indústria Geral',
-                        score: Math.floor(Math.random() * 20) + 80,
-                        decisor: 'Gerente de Supply Chain',
-                        cargo: 'Logística & Suprimentos',
-                        email: emailLido || 'contato@empresa.com.br',
-                        tel: telLido || '(31) 3000-0000',
-                        solucao: 'Porta-Paletes & Estruturas BSA',
-                        status: 'Novo'
+                        cnpj: registro.cnpj,
+                        cnpjBasico: registro.cnpjBasico,
+                        cnpjValido: registro.cnpjValido,
+                        nome: registro.nome || 'Razao social nao disponivel nesta base',
+                        razao: registro.razao,
+                        fantasia: registro.fantasia,
+                        uf: registro.uf,
+                        cidade: registro.cidade,
+                        municipioCodigo: registro.municipioCodigo,
+                        cnae: registro.cnae,
+                        setor: registro.setor || 'Nao informado',
+                        email: registro.email,
+                        tel: registro.tel,
+                        matrizFilial: registro.matrizFilial,
+                        situacao: registro.situacao,
+                        porte: registro.porte,
+                        capital: registro.capital,
+                        cep: registro.cep,
+                        dataAbertura: registro.dataAbertura,
+                        score: 0,
+                        decisor: '',
+                        cargo: '',
+                        solucao: 'Pendente de qualificacao',
+                        status: registro.cnpjValido ? 'Importado' : 'Requer validacao',
+                        origemImportacao: nomeArquivo
                     });
                     novosContadores++;
                 }
             });
 
-            // Insere no histórico de importações
+            const processados = novosContadores + atualizadosContadores;
             BASE_GLOBAL.historico.unshift({
                 nome: nomeArquivo,
-                origem: 'Upload Anexo 02 / Receita',
+                origem: `${diagnostico.detalheOrigem || 'Upload'} | ${layout} | ${diagnostico.modo || 'adaptativo'}`,
                 data: new Date().toLocaleString('pt-BR'),
-                linhas: dadosBrutos.length.toLocaleString('pt-BR'),
-                validos: (novosContadores + atualizadosContadores).toLocaleString('pt-BR'),
-                duplicados: atualizadosContadores.toLocaleString('pt-BR'),
-                status: 'Consolidado'
+                linhas: linhasPreenchidas.length.toLocaleString('pt-BR'),
+                validos: Math.max(0, processados - invalidosContadores).toLocaleString('pt-BR'),
+                duplicados: duplicadosNoArquivo.toLocaleString('pt-BR'),
+                status: processados ? 'Consolidado' : 'Sem chave identificada'
             });
 
-            // Exibe resumo de resultados
-            document.getElementById('res-totais').innerText = dadosBrutos.length.toLocaleString('pt-BR');
-            document.getElementById('res-validos').innerText = (novosContadores + atualizadosContadores).toLocaleString('pt-BR');
-            document.getElementById('res-duplicados').innerText = '0';
+            document.getElementById('res-totais').innerText = linhasPreenchidas.length.toLocaleString('pt-BR');
+            document.getElementById('res-validos').innerText = Math.max(0, processados - invalidosContadores).toLocaleString('pt-BR');
+            document.getElementById('res-duplicados').innerText = duplicadosNoArquivo.toLocaleString('pt-BR');
             document.getElementById('res-novos').innerText = novosContadores.toLocaleString('pt-BR');
             document.getElementById('res-atualizados').innerText = atualizadosContadores.toLocaleString('pt-BR');
             document.getElementById('upload-results-summary').style.display = 'block';
-
             document.getElementById('status-base-header').innerText = `Base Ativa: ${nomeArquivo} (${BASE_GLOBAL.empresas.length} registros no total)`;
 
             atualizarTudoNaTela();
 
-            alert(`Sucesso! ${novosContadores} novos registros adicionados e ${atualizadosContadores} enriquecidos via PROCX por CNPJ!`);
+            const observacoes = [];
+            if (invalidosContadores) observacoes.push(`${invalidosContadores} CNPJ(s) com digito verificador invalido`);
+            if (semChaveContadores) observacoes.push(`${semChaveContadores} linha(s) sem CNPJ ou CNPJ basico identificavel`);
+            if (duplicadosNoArquivo) observacoes.push(`${duplicadosNoArquivo} duplicidade(s) dentro do proprio arquivo`);
+            const complemento = observacoes.length ? `\n\nAtencao:\n- ${observacoes.join('\n- ')}` : '';
+
+            alert(
+                `Importacao concluida.\n` +
+                `Layout detectado: ${layout}.\n` +
+                `${novosContadores} novo(s) registro(s).\n` +
+                `${atualizadosContadores} registro(s) atualizado(s).` +
+                complemento
+            );
         }
 
         function cancelUploadSimulation() {
+            ARQUIVO_PENDENTE = null;
+            document.getElementById('file-input').value = '';
             document.getElementById('upload-progress-section').style.display = 'none';
             document.getElementById('upload-results-summary').style.display = 'none';
+            document.getElementById('upload-progress-bar').style.width = '0%';
         }
 
         function executeGlobalSearch(term) {
@@ -765,7 +1117,7 @@
             const emp = BASE_GLOBAL.empresas.find(e => e.cnpj === cnpj) || BASE_GLOBAL.empresas[0];
             document.getElementById('e360-nome').innerText = emp.nome;
             document.getElementById('e360-cnpj').innerText = 'CNPJ: ' + (emp.cnpj || 'N/D');
-            document.getElementById('e360-score').innerText = 'Score: ' + (emp.score || 85) + ' / 100';
+            document.getElementById('e360-score').innerText = 'Score: ' + (Number.isFinite(Number(emp.score)) ? Number(emp.score) : 0) + ' / 100';
 
             document.getElementById('m360-nome').innerText = emp.nome;
             document.getElementById('m360-conteudo').innerHTML = `
