@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PAIM.IA.PROSPECT VER08 | Bertolini Sistemas de Armazenagem</title>
+    <title>PAIM.IA.PROSPECT VER09 IM | Bertolini Sistemas de Armazenagem</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -259,6 +259,8 @@
             background-color: var(--branco); border-radius: 8px;
             max-width: 650px; width: 90%; max-height: 85vh; overflow-y: auto; padding: 24px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
         }
+    
+        .im-toolbar{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0}.im-toolbar input,.im-toolbar select{padding:9px 10px;border:1px solid #cbd5e1;border-radius:7px;min-width:160px}.im-btn{background:#0f4c97;color:#fff;border:0;border-radius:7px;padding:9px 14px;font-weight:700;cursor:pointer}.im-btn.secondary{background:#f58220}.im-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin:14px 0}.im-kpi{background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:14px}.im-kpi b{display:block;font-size:24px;color:#0f4c97;margin-top:5px}.im-badge{display:inline-block;padding:4px 8px;border-radius:999px;font-size:11px;font-weight:700}.im-alta{background:#dcfce7;color:#166534}.im-media{background:#fef3c7;color:#92400e}.im-baixa{background:#e2e8f0;color:#475569}.im-rule{display:grid;grid-template-columns:1fr 100px 72px;gap:10px;align-items:center;padding:9px 0;border-bottom:1px solid #e2e8f0}.im-empty{padding:28px;text-align:center;color:#64748b}.im-note{font-size:12px;color:#64748b;margin-top:8px}.im-click{cursor:pointer;color:#0f4c97;font-weight:700}.im-panel{background:#f8fafc;border-left:4px solid #f58220;padding:12px;border-radius:6px;margin:10px 0}
     </style>
 </head>
 <body>
@@ -286,7 +288,7 @@
                 <li class="nav-item"><a class="nav-link" onclick="switchTab('tab-config')">🔒 Configurações & Governança</a></li>
             </ul>
             <div style="padding:14px 16px; border-top:1px solid rgba(255,255,255,0.1); font-size:11px; color:#94A3B8; background-color:var(--azul-escuro);">
-                PAIM.IA.PROSPECT VER08 - STREAMING ROBUSTO<br>Motor Adaptativo Anexo 02
+                PAIM.IA.PROSPECT v2.3 STREAMING NATIVO<br>Motor Adaptativo Anexo 02
             </div>
         </aside>
 
@@ -417,35 +419,18 @@
 
                 <!-- 5. RADAR DE MERCADO -->
                 <div id="tab-radar" class="tab-content">
-                    <div style="margin-bottom:20px;"><h1 style="font-size:20px; font-weight:700; color:var(--azul-principal);">Radar de Mercado</h1></div>
-                    <div class="card">
-                        <div class="table-container">
-                            <table>
-                                <thead><tr><th>Data</th><th>Empresa</th><th>CNPJ</th><th>Tipo de Sinal</th><th>Confiança</th><th>Fonte</th></tr></thead>
-                                <tbody id="tbody-radar-sinais"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
+<div><h1 style="font-size:20px;color:var(--azul-principal)">Radar de Investimentos e Mercado</h1><p style="color:var(--texto-secundario);font-size:13px">Identifica expansão, nova planta, CD, automação, obras e aumento de capacidade nos dados importados.</p></div>
+<div class="im-toolbar"><input id="radar-termo" placeholder="Empresa, cidade ou sinal"><select id="radar-uf"><option value="">Todos os estados</option></select><select id="radar-nivel"><option value="">Toda prioridade</option><option>Alta</option><option>Média</option><option>Baixa</option></select><button class="im-btn" onclick="executarMotorIM()">Analisar base</button></div>
+<div class="im-grid" id="radar-kpis"></div><div class="card"><div class="table-container"><table><thead><tr><th>Empresa</th><th>Investimento/Sinal</th><th>Local</th><th>Fonte</th><th>Score IM</th><th>Prioridade</th><th>Ação</th></tr></thead><tbody id="tbody-radar-im"></tbody></table></div></div></div>
+
 
                 <!-- 6. ICP & SCORE -->
-                <div id="tab-icp-score" class="tab-content">
-                    <div style="margin-bottom:20px;"><h1 style="font-size:20px; font-weight:700; color:var(--azul-principal);">ICP & Configuração de Pesos</h1></div>
-                    <div class="card"><p>Ajuste de ponderação do score composto da base por Solução BSA.</p></div>
-                </div>
+                <div id="tab-icp-score" class="tab-content"><h1 style="font-size:20px;color:var(--azul-principal)">ICP & Regras de Inteligência de Mercado</h1><p style="color:var(--texto-secundario);font-size:13px">Ajuste os pesos e recalcule todas as empresas. O total máximo é 100 pontos.</p><div class="card"><div id="im-regras"></div><div class="im-toolbar"><button class="im-btn" onclick="salvarRegrasIM()">Salvar e recalcular</button><button class="im-btn secondary" onclick="restaurarRegrasIM()">Restaurar padrão BSA</button></div><div class="im-note">Critérios BSA: investimento/expansão, aderência intralogística, porte/capital, localização e qualidade de contato.</div></div><div class="card"><h2 class="card-title">Distribuição da base</h2><div class="im-grid" id="score-kpis"></div></div></div>
+
 
                 <!-- 7. FILA DE OPORTUNIDADES -->
-                <div id="tab-oportunidades" class="tab-content">
-                    <div style="margin-bottom:20px;"><h1 style="font-size:20px; font-weight:700; color:var(--azul-principal);">Fila de Oportunidades Qualificadas</h1></div>
-                    <div class="card">
-                        <div class="table-container">
-                            <table>
-                                <thead><tr><th>Empresa</th><th>UF</th><th>Score</th><th>Solução Sugerida</th><th>Status</th><th>Ações</th></tr></thead>
-                                <tbody id="tbody-oportunidades"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
+                <div id="tab-oportunidades" class="tab-content"><h1 style="font-size:20px;color:var(--azul-principal)">Fila de Oportunidades Qualificadas</h1><p style="color:var(--texto-secundario);font-size:13px">Empresas ordenadas pelo Score IM, com justificativa e próxima ação.</p><div class="im-toolbar"><select id="opp-min"><option value="70">Score mínimo 70</option><option value="50">Score mínimo 50</option><option value="0">Todas</option></select><button class="im-btn" onclick="renderMotorIM()">Atualizar fila</button><button class="im-btn secondary" onclick="exportarOportunidadesCSV()">Exportar CSV</button></div><div class="card"><div class="table-container"><table><thead><tr><th>#</th><th>Empresa</th><th>CNPJ</th><th>Score</th><th>Por que entrou</th><th>Solução BSA sugerida</th><th>Próxima ação</th></tr></thead><tbody id="tbody-oportunidades-im"></tbody></table></div></div></div>
+
 
                 <!-- 8. LISTAS BDR -->
                 <div id="tab-bdr" class="tab-content">
@@ -464,10 +449,8 @@
                 </div>
 
                 <!-- 9. FONTES MONITORADAS -->
-                <div id="tab-fontes" class="tab-content">
-                    <div style="margin-bottom:20px;"><h1 style="font-size:20px; font-weight:700; color:var(--azul-principal);">Fontes Monitoradas</h1></div>
-                    <div class="card"><p>Listagem de Diários Oficiais, RSS e Páginas de RI conectadas.</p></div>
-                </div>
+                <div id="tab-fontes" class="tab-content"><h1 style="font-size:20px;color:var(--azul-principal)">Fontes Monitoradas</h1><div class="im-panel"><b>Como alimentar o Radar:</b> importe CSV com colunas como empresa, CNPJ, cidade, UF, investimento, projeto, notícia, fonte, data, CNAE, capital social, porte, telefone e e-mail. O motor reconhece variações dos nomes.</div><div class="card"><div class="table-container"><table><thead><tr><th>Tipo</th><th>Exemplos</th><th>Status nesta versão</th></tr></thead><tbody><tr><td>Base empresarial</td><td>Receita Federal, CRM, mailing</td><td><span class="im-badge im-alta">Importação ativa</span></td></tr><tr><td>Sinais públicos</td><td>Diários oficiais, notícias, RI, licenças</td><td><span class="im-badge im-media">Via CSV</span></td></tr><tr><td>Integrações automáticas</td><td>APIs, RSS e robôs</td><td><span class="im-badge im-baixa">Requer backend</span></td></tr></tbody></table></div></div></div>
+
 
                 <!-- 10. CONFIGURAÇÕES & GOVERNANÇA -->
                 <div id="tab-config" class="tab-content">
@@ -508,10 +491,14 @@
         function switchTab(tabId) {
             document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-            document.getElementById(tabId).classList.add('active');
+            const destino = document.getElementById(tabId);
+            if (!destino) return;
+            destino.classList.add('active');
             document.querySelectorAll('.nav-link').forEach(l => {
                 if(l.getAttribute('onclick') && l.getAttribute('onclick').includes(tabId)) l.classList.add('active');
             });
+            if(['tab-radar','tab-icp-score','tab-oportunidades'].includes(tabId)) renderMotorIM();
+            window.scrollTo({top:0,behavior:'smooth'});
         }
 
         window.onload = function() {
@@ -529,6 +516,7 @@
             renderRadarSinais();
             renderOportunidades();
             renderBdrList();
+            renderMotorIM();
         }
 
         function renderHistoricoBases() {
@@ -972,10 +960,7 @@
             });
         }
 
-        const LIMITE_IMPORTACAO_MEMORIA = 20 * 1024 * 1024;
-        const TAMANHO_LOTE_INDEXEDDB = 3000;
-        const TAMANHO_AMOSTRA_TELA = 300;
-        const LIMITE_EXCEL_NAVEGADOR = 120 * 1024 * 1024;
+        const LIMITE_IMPORTACAO_MEMORIA = 25 * 1024 * 1024;
         const DB_NOME_PROSPECT = 'PAIM_IA_PROSPECT_DB';
         const DB_VERSAO_PROSPECT = 1;
 
@@ -1072,166 +1057,71 @@
             return extrairRegistroCanonico(obj,'flexivel');
         }
 
-        async function verificarEspacoLocalNecessario(arquivo) {
-            if (!navigator.storage || !navigator.storage.estimate) return;
-            const estimativa = await navigator.storage.estimate();
-            const livre = Math.max(0, (estimativa.quota || 0) - (estimativa.usage || 0));
-            // IndexedDB pode ocupar mais que o CSV devido a indices e objetos JavaScript.
-            const necessario = Math.ceil(arquivo.size * 1.8);
-            if (livre && livre < necessario) {
-                throw new Error(
-                    `Espaco local insuficiente. Livre: ${(livre / 1073741824).toFixed(2)} GB. ` +
-                    `Estimado para esta base: ${(necessario / 1073741824).toFixed(2)} GB. ` +
-                    `Libere espaco no navegador ou use um CSV menor/dividido.`
-                );
-            }
-            if (navigator.storage.persist) {
-                try { await navigator.storage.persist(); } catch (_) {}
-            }
-        }
-
-        function criarItemBanco(r, arquivo) {
-            const chave = r.cnpjDigitos || (r.cnpjBasico ? `BASE:${r.cnpjBasico}` : '');
-            if (!chave) return null;
-            return {
-                chave,
-                cnpj: r.cnpj,
-                cnpjDigitos: r.cnpjDigitos,
-                cnpjBasico: r.cnpjBasico,
-                cnpjValido: r.cnpjValido,
-                nome: r.nome || 'Razao social nao disponivel nesta base',
-                razao: r.razao,
-                fantasia: r.fantasia,
-                uf: r.uf,
-                cidade: r.cidade,
-                municipioCodigo: r.municipioCodigo,
-                cnae: r.cnae,
-                setor: r.setor || 'Nao informado',
-                email: r.email,
-                tel: r.tel,
-                matrizFilial: r.matrizFilial,
-                situacao: r.situacao,
-                porte: r.porte,
-                capital: r.capital,
-                cep: r.cep,
-                dataAbertura: r.dataAbertura,
-                score: 0,
-                status: r.cnpjValido ? 'Importado' : 'Requer validacao',
-                origemImportacao: arquivo.name
-            };
-        }
-
         async function importarCSVGrandeEmStreaming(arquivo) {
-            await verificarEspacoLocalNecessario(arquivo);
             const db = await abrirBancoProspect();
             const barra = document.getElementById('upload-progress-bar');
             const status = document.getElementById('upload-percentage');
-            const amostraTela = [];
-            let totalLinhas = 0, validos = 0, invalidos = 0, semChave = 0;
-            let layout = 'flexivel', cabecalhos = null, cabecalhoResolvido = false;
-            let lotePendente = [];
-            let bytesEstimados = 0;
-            let ultimoPct = 0;
+            const TAM_BLOCO = 2 * 1024 * 1024;
+            const decoder = new TextDecoder('utf-8');
+            let offset=0, sobra='', delimitador=';', layout='flexivel', cabecalhos=null;
+            let primeiraLeitura=true, totalLinhas=0, validos=0, invalidos=0, semChave=0;
+            const amostraTela=[];
 
-            const amostraTexto = await arquivo.slice(0, Math.min(512 * 1024, arquivo.size)).text();
-            const delimitador = detectarDelimitadorAmostra(amostraTexto);
-            const linhasAmostra = amostraTexto.replace(/^\uFEFF/, '').split(/\r?\n/).filter(Boolean).slice(0, 40).map(l => csvLinhaParaColunas(l, delimitador));
+            // Pequena amostra para detectar delimitador e layout sem abrir o arquivo inteiro.
+            const amostraTexto = decoder.decode(await arquivo.slice(0, Math.min(256*1024, arquivo.size)).arrayBuffer());
+            delimitador = detectarDelimitadorAmostra(amostraTexto);
+            const linhasAmostra = amostraTexto.replace(/^\uFEFF/,'').split(/\r?\n/).filter(Boolean).slice(0,30).map(l=>csvLinhaParaColunas(l,delimitador));
             const convertidoAmostra = matrizParaObjetos(linhasAmostra);
-            if (convertidoAmostra.indiceCabecalho >= 0) cabecalhos = convertidoAmostra.cabecalhos;
-            layout = detectarLayoutReceita(cabecalhos || convertidoAmostra.cabecalhos, convertidoAmostra.registros);
+            const cabecalhoReal = convertidoAmostra.indiceCabecalho >= 0;
+            if (cabecalhoReal) cabecalhos=convertidoAmostra.cabecalhos;
+            layout=detectarLayoutReceita(cabecalhos || convertidoAmostra.cabecalhos, convertidoAmostra.registros);
 
-            async function descarregarLote() {
-                if (!lotePendente.length) return;
-                const lote = lotePendente;
-                lotePendente = [];
-                await salvarLoteIndexedDB(db, lote);
-                // Entrega tempo ao navegador para pintura e evita a mensagem "pagina sem resposta".
-                await new Promise(resolve => setTimeout(resolve, 0));
+            while (offset < arquivo.size) {
+                const fim=Math.min(offset+TAM_BLOCO,arquivo.size);
+                let texto=sobra+decoder.decode(await arquivo.slice(offset,fim).arrayBuffer(),{stream:fim<arquivo.size});
+                texto=texto.replace(/\u0000/g,'');
+                const partes=texto.split(/\r?\n/);
+                sobra=fim<arquivo.size ? (partes.pop() || '') : '';
+                if (fim>=arquivo.size && sobra) { partes.push(sobra); sobra=''; }
+
+                let linhas=partes.filter(l=>l.trim());
+                if (primeiraLeitura && cabecalhoReal) {
+                    const idx=localizarCabecalho(linhas.slice(0,30).map(l=>csvLinhaParaColunas(l,delimitador)));
+                    if (idx>=0) linhas=linhas.slice(idx+1);
+                }
+                primeiraLeitura=false;
+
+                const lote=[];
+                for (const linha of linhas) {
+                    const cols=csvLinhaParaColunas(linha,delimitador);
+                    const r=extrairCanonicoPosicional(cols,layout,cabecalhos);
+                    totalLinhas++;
+                    const chave=r.cnpjDigitos || (r.cnpjBasico?`BASE:${r.cnpjBasico}`:'');
+                    if(!chave){semChave++;continue;}
+                    if(r.cnpjDigitos&&r.cnpjValido)validos++; else if(r.cnpjDigitos)invalidos++;
+                    const item={chave,cnpj:r.cnpj,cnpjDigitos:r.cnpjDigitos,cnpjBasico:r.cnpjBasico,cnpjValido:r.cnpjValido,nome:r.nome||'Razao social nao disponivel nesta base',razao:r.razao,fantasia:r.fantasia,uf:r.uf,cidade:r.cidade,municipioCodigo:r.municipioCodigo,cnae:r.cnae,setor:r.setor||'Nao informado',email:r.email,tel:r.tel,matrizFilial:r.matrizFilial,situacao:r.situacao,porte:r.porte,capital:r.capital,cep:r.cep,dataAbertura:r.dataAbertura,score:0,status:r.cnpjValido?'Importado':'Requer validacao',origemImportacao:arquivo.name};
+                    lote.push(item); if(amostraTela.length<300)amostraTela.push(item);
+                }
+                if(lote.length) await salvarLoteIndexedDB(db,lote);
+                offset=fim;
+                const pct=Math.max(1,Math.min(99,Math.round(offset/arquivo.size*100)));
+                barra.style.width=pct+'%';
+                status.innerText=`Processando ${totalLinhas.toLocaleString('pt-BR')} linhas - ${pct}%`;
+                await new Promise(r=>setTimeout(r,15));
             }
 
-            await new Promise((resolve, reject) => {
-                Papa.parse(arquivo, {
-                    delimiter: delimitador,
-                    header: false,
-                    skipEmptyLines: 'greedy',
-                    worker: false,
-                    chunkSize: 2 * 1024 * 1024,
-                    dynamicTyping: false,
-                    chunk: async function(resultados, parser) {
-                        parser.pause();
-                        try {
-                            let linhas = resultados.data || [];
-                            if (!cabecalhoResolvido) {
-                                cabecalhoResolvido = true;
-                                if (convertidoAmostra.indiceCabecalho >= 0) {
-                                    const idx = localizarCabecalho(linhas.slice(0, 40));
-                                    if (idx >= 0) linhas = linhas.slice(idx + 1);
-                                }
-                            }
-                            for (const cols of linhas) {
-                                if (!Array.isArray(cols) || !cols.some(valorPreenchido)) continue;
-                                totalLinhas++;
-                                const r = extrairCanonicoPosicional(cols, layout, cabecalhos);
-                                const item = criarItemBanco(r, arquivo);
-                                if (!item) { semChave++; continue; }
-                                if (r.cnpjDigitos && r.cnpjValido) validos++;
-                                else if (r.cnpjDigitos) invalidos++;
-                                lotePendente.push(item);
-                                if (amostraTela.length < TAMANHO_AMOSTRA_TELA) amostraTela.push(item);
-                                if (lotePendente.length >= TAMANHO_LOTE_INDEXEDDB) await descarregarLote();
-                            }
-                            // Papa Parse nao expoe bytes exatos por chunk. A estimativa por cursor mantem o progresso responsivo.
-                            bytesEstimados = Math.min(arquivo.size, bytesEstimados + 2 * 1024 * 1024);
-                            const pct = Math.max(1, Math.min(99, Math.round(bytesEstimados / arquivo.size * 100)));
-                            if (pct !== ultimoPct) {
-                                ultimoPct = pct;
-                                barra.style.width = pct + '%';
-                                status.innerText = `Processando ${totalLinhas.toLocaleString('pt-BR')} linhas - ${pct}%`;
-                            }
-                            parser.resume();
-                        } catch (erro) {
-                            parser.abort();
-                            reject(erro);
-                        }
-                    },
-                    complete: async function() {
-                        try {
-                            await descarregarLote();
-                            resolve();
-                        } catch (erro) { reject(erro); }
-                    },
-                    error: reject
-                });
-            });
-
-            const totalBanco = await contarRegistrosIndexedDB(db);
-            BASE_GLOBAL.empresas = amostraTela;
-            BASE_GLOBAL.historico.unshift({
-                nome: arquivo.name,
-                origem: `CSV streaming robusto | IndexedDB | ${layout}`,
-                data: new Date().toLocaleString('pt-BR'),
-                linhas: totalLinhas.toLocaleString('pt-BR'),
-                validos: validos.toLocaleString('pt-BR'),
-                duplicados: 'Consolidados pela chave',
-                status: 'Consolidado localmente'
-            });
-            document.getElementById('res-totais').innerText = totalLinhas.toLocaleString('pt-BR');
-            document.getElementById('res-validos').innerText = validos.toLocaleString('pt-BR');
-            document.getElementById('res-duplicados').innerText = 'Por chave';
-            document.getElementById('res-novos').innerText = totalBanco.toLocaleString('pt-BR');
-            document.getElementById('res-atualizados').innerText = 'IndexedDB';
-            document.getElementById('upload-results-summary').style.display = 'block';
-            document.getElementById('status-base-header').innerText = `Base local: ${totalBanco.toLocaleString('pt-BR')} registros | amostra visual ${amostraTela.length}`;
-            barra.style.width = '100%';
-            status.innerText = 'Importacao concluida';
-            atualizarTudoNaTela();
-            alert(
-                `Importacao concluida.\nLinhas lidas: ${totalLinhas.toLocaleString('pt-BR')}` +
-                `\nCNPJs validos: ${validos.toLocaleString('pt-BR')}` +
-                `\nCNPJs invalidos: ${invalidos.toLocaleString('pt-BR')}` +
-                `\nSem chave: ${semChave.toLocaleString('pt-BR')}` +
-                `\nRegistros no banco local: ${totalBanco.toLocaleString('pt-BR')}`
-            );
+            const totalBanco=await contarRegistrosIndexedDB(db);
+            BASE_GLOBAL.empresas=amostraTela;
+            BASE_GLOBAL.historico.unshift({nome:arquivo.name,origem:`CSV streaming nativo | IndexedDB | ${layout}`,data:new Date().toLocaleString('pt-BR'),linhas:totalLinhas.toLocaleString('pt-BR'),validos:validos.toLocaleString('pt-BR'),duplicados:'Consolidados pela chave',status:'Consolidado localmente'});
+            document.getElementById('res-totais').innerText=totalLinhas.toLocaleString('pt-BR');
+            document.getElementById('res-validos').innerText=validos.toLocaleString('pt-BR');
+            document.getElementById('res-duplicados').innerText='Por chave';
+            document.getElementById('res-novos').innerText=totalBanco.toLocaleString('pt-BR');
+            document.getElementById('res-atualizados').innerText='IndexedDB';
+            document.getElementById('upload-results-summary').style.display='block';
+            document.getElementById('status-base-header').innerText=`Base local: ${totalBanco.toLocaleString('pt-BR')} registros | amostra visual 300`;
+            barra.style.width='100%'; status.innerText='Importacao concluida'; atualizarTudoNaTela();
+            alert(`Importacao concluida.\nLinhas lidas: ${totalLinhas.toLocaleString('pt-BR')}\nCNPJs validos: ${validos.toLocaleString('pt-BR')}\nCNPJs invalidos: ${invalidos.toLocaleString('pt-BR')}\nSem chave: ${semChave.toLocaleString('pt-BR')}\nRegistros no banco local: ${totalBanco.toLocaleString('pt-BR')}`);
         }
 
         async function processUploadedFile() {
@@ -1255,8 +1145,8 @@
                     return;
                 }
 
-                if ((fileName.endsWith('.xlsx') || fileName.endsWith('.xls')) && arquivo.size > LIMITE_EXCEL_NAVEGADOR) {
-                    throw new Error('Excel muito grande para processamento seguro no navegador. Salve a aba como CSV UTF-8 e importe o CSV. O VER08 processa CSV acima de 500 MB em streaming, sem carregar o arquivo inteiro na memoria.');
+                if ((fileName.endsWith('.xlsx') || fileName.endsWith('.xls')) && arquivo.size > 100 * 1024 * 1024) {
+                    throw new Error('Este Excel ultrapassa 100 MB. Converta a aba para CSV e importe o CSV. Arquivos Excel grandes precisam ser descompactados integralmente na memoria do navegador.');
                 }
 
                 let matriz = [];
@@ -1464,6 +1354,51 @@
             `;
             document.getElementById('modal-empresa-360').classList.add('active');
         }
-    </script>
+    
+
+        const REGRAS_IM_PADRAO = {
+            investimento: 35, aderencia: 25, porte: 15, localizacao: 10, contato: 15
+        };
+        let REGRAS_IM = {...REGRAS_IM_PADRAO}; try { const regrasSalvasIM = window.localStorage.getItem('paim_regras_im'); if (regrasSalvasIM) { const regrasIM = JSON.parse(regrasSalvasIM); if (regrasIM && typeof regrasIM === 'object' && !Array.isArray(regrasIM)) REGRAS_IM = {...REGRAS_IM, ...regrasIM}; } } catch (e) { /* Preview sandbox may block localStorage; keep default rules. */ }
+        const TERMOS_INVESTIMENTO = ['investimento','expansao','expansão','nova fabrica','nova fábrica','nova planta','centro de distribuicao','centro de distribuição','novo cd','ampliacao','ampliação','aumento de capacidade','obra','automacao','automação','modernizacao','modernização','greenfield','brownfield','inauguracao','inauguração'];
+        const TERMOS_ADERENCIA = ['logistica','logística','armazenagem','deposito','depósito','distribuicao','distribuição','industria','indústria','atacado','varejo','alimentos','bebidas','metalurg','farmac','autope','moveis','móveis','e-commerce','operador logistico','operador logístico'];
+        function textoIM(e){ return Object.values(e||{}).filter(v=>typeof v==='string'||typeof v==='number').join(' ').toLowerCase(); }
+        function valorCapital(e){ const v=e.capital||e.capitalSocial||e['capital social']||0; return Number(String(v).replace(/[^0-9,.-]/g,'').replace(/\./g,'').replace(',','.'))||0; }
+        function campoPrimeiro(e, nomes){ for(const n of nomes){ const k=Object.keys(e||{}).find(x=>x.toLowerCase().includes(n)); if(k&&e[k]) return e[k]; } return ''; }
+        function analisarEmpresaIM(e){
+            const t=textoIM(e); let score=0, motivos=[];
+            const sinais=TERMOS_INVESTIMENTO.filter(x=>t.includes(x));
+            if(sinais.length){ score+=REGRAS_IM.investimento; motivos.push('Sinal de investimento: '+sinais.slice(0,2).join(', ')); }
+            const ad=TERMOS_ADERENCIA.filter(x=>t.includes(x));
+            if(ad.length){ score+=REGRAS_IM.aderencia; motivos.push('Aderência BSA: '+ad.slice(0,2).join(', ')); }
+            const cap=valorCapital(e); const porte=String(e.porte||'').toLowerCase();
+            if(cap>=10000000 || /grande|medio|médio/.test(porte)){ score+=REGRAS_IM.porte; motivos.push('Porte/capital relevante'); }
+            const uf=String(e.uf||e.estado||'').toUpperCase();
+            if(['RS','SC','PR','SP','MG','GO'].includes(uf)){ score+=REGRAS_IM.localizacao; motivos.push('Localização prioritária'); }
+            if(e.email||e.tel||e.telefone||campoPrimeiro(e,['email','telefone','celular'])){ score+=REGRAS_IM.contato; motivos.push('Contato disponível'); }
+            score=Math.min(100,score); e.score=score; e.motivosIM=motivos; e.sinalIM=sinais[0]||campoPrimeiro(e,['invest','projeto','noticia','notícia','sinal'])||'Sem sinal explícito';
+            e.fonteIM=campoPrimeiro(e,['fonte','origem','url'])||e.origemImportacao||'Base importada';
+            e.prioridadeIM=score>=70?'Alta':score>=45?'Média':'Baixa';
+            e.solucaoIM=/centro de distribu|novo cd|logistic|armazen/.test(t)?'Porta-Pallet / Drive-In / Shuttle':/metal|tubo|perfil|madeira/.test(t)?'Cantilever':'Diagnóstico intralogístico BSA';
+            return e;
+        }
+        function executarMotorIM(){ (BASE_GLOBAL.empresas||[]).forEach(analisarEmpresaIM); renderMotorIM(); atualizarTudoNaTela(); }
+        function renderMotorIM(){
+            (BASE_GLOBAL.empresas||[]).forEach(analisarEmpresaIM); renderRegrasIM();
+            const lista=[...(BASE_GLOBAL.empresas||[])].sort((a,b)=>(b.score||0)-(a.score||0));
+            const termo=(document.getElementById('radar-termo')?.value||'').toLowerCase(), uf=document.getElementById('radar-uf')?.value||'', nivel=document.getElementById('radar-nivel')?.value||'';
+            const ufs=[...new Set(lista.map(e=>e.uf).filter(Boolean))].sort(); const sel=document.getElementById('radar-uf'); if(sel&&sel.options.length<=1) ufs.forEach(x=>sel.add(new Option(x,x)));
+            const filtrada=lista.filter(e=>(!termo||textoIM(e).includes(termo))&&(!uf||e.uf===uf)&&(!nivel||e.prioridadeIM===nivel));
+            const rk=document.getElementById('radar-kpis'); if(rk) rk.innerHTML=`<div class="im-kpi">Empresas analisadas<b>${lista.length.toLocaleString('pt-BR')}</b></div><div class="im-kpi">Sinais de investimento<b>${lista.filter(e=>e.sinalIM!=='Sem sinal explícito').length.toLocaleString('pt-BR')}</b></div><div class="im-kpi">Prioridade alta<b>${lista.filter(e=>e.prioridadeIM==='Alta').length.toLocaleString('pt-BR')}</b></div><div class="im-kpi">Com contato<b>${lista.filter(e=>e.email||e.tel||e.telefone).length.toLocaleString('pt-BR')}</b></div>`;
+            const tr=document.getElementById('tbody-radar-im'); if(tr) tr.innerHTML=filtrada.slice(0,500).map(e=>`<tr><td class="im-click" onclick="abrirEmpresa360PorCnpj('${e.cnpjDigitos||''}')">${e.nome||e.razao||'Não informado'}</td><td>${e.sinalIM}</td><td>${e.cidade||'-'} / ${e.uf||'-'}</td><td>${e.fonteIM}</td><td><b>${e.score}</b></td><td><span class="im-badge im-${e.prioridadeIM==='Alta'?'alta':e.prioridadeIM==='Média'?'media':'baixa'}">${e.prioridadeIM}</span></td><td><button class="im-btn" onclick="abrirEmpresa360PorCnpj('${e.cnpjDigitos||''}')">Ver 360°</button></td></tr>`).join('')||'<tr><td colspan="7" class="im-empty">Importe uma base ou altere os filtros.</td></tr>';
+            const min=Number(document.getElementById('opp-min')?.value||70), opp=lista.filter(e=>e.score>=min); const to=document.getElementById('tbody-oportunidades-im'); if(to) to.innerHTML=opp.slice(0,1000).map((e,i)=>`<tr><td>${i+1}</td><td>${e.nome||e.razao||'-'}</td><td>${e.cnpj||'-'}</td><td><b>${e.score}</b></td><td>${(e.motivosIM||[]).join('; ')||'Cadastro para enriquecimento'}</td><td>${e.solucaoIM}</td><td>${e.email||e.tel?'Contatar e validar projeto':'Enriquecer contato e confirmar investimento'}</td></tr>`).join('')||'<tr><td colspan="7" class="im-empty">Nenhuma oportunidade neste corte.</td></tr>';
+            const sk=document.getElementById('score-kpis'); if(sk) sk.innerHTML=`<div class="im-kpi">Alta (70+)<b>${lista.filter(e=>e.score>=70).length}</b></div><div class="im-kpi">Média (45-69)<b>${lista.filter(e=>e.score>=45&&e.score<70).length}</b></div><div class="im-kpi">Baixa (&lt;45)<b>${lista.filter(e=>e.score<45).length}</b></div>`;
+        }
+        function renderRegrasIM(){ const el=document.getElementById('im-regras'); if(!el)return; const nomes={investimento:'Sinal de investimento/expansão',aderencia:'Aderência à intralogística BSA',porte:'Porte ou capital social',localizacao:'Localização prioritária',contato:'Telefone ou e-mail disponível'}; el.innerHTML=Object.keys(REGRAS_IM).map(k=>`<div class="im-rule"><span>${nomes[k]}</span><input type="number" min="0" max="100" id="regra-${k}" value="${REGRAS_IM[k]}"><b>pontos</b></div>`).join(''); }
+        function salvarRegrasIM(){ Object.keys(REGRAS_IM).forEach(k=>REGRAS_IM[k]=Number(document.getElementById('regra-'+k)?.value||0)); try { window.localStorage.setItem('paim_regras_im',JSON.stringify(REGRAS_IM)); } catch (e) { /* Preview sandbox may block localStorage; rules remain available in memory. */ } executarMotorIM(); alert('Regras de IM salvas e base recalculada.'); }
+        function restaurarRegrasIM(){ REGRAS_IM={...REGRAS_IM_PADRAO}; try { window.localStorage.setItem('paim_regras_im',JSON.stringify(REGRAS_IM)); } catch (e) { /* Preview sandbox may block localStorage; defaults remain available in memory. */ } executarMotorIM(); }
+        function abrirEmpresa360PorCnpj(cnpj){ const e=(BASE_GLOBAL.empresas||[]).find(x=>(x.cnpjDigitos||'')===cnpj); if(!e)return; if(typeof abrirModal360==='function') abrirModal360(e); else { switchTab('tab-empresa-360'); const box=document.getElementById('empresa-360-content'); if(box) box.innerHTML=`<div class="card"><h2>${e.nome||e.razao}</h2><p>CNPJ: ${e.cnpj||'-'}</p><p>Score IM: ${e.score}</p><p>${(e.motivosIM||[]).join('<br>')}</p></div>`; } }
+        function exportarOportunidadesCSV(){ const min=Number(document.getElementById('opp-min')?.value||70); const rows=(BASE_GLOBAL.empresas||[]).filter(e=>(e.score||0)>=min); const esc=v=>'"'+String(v??'').replace(/"/g,'""')+'"'; const csv=['Empresa;CNPJ;Cidade;UF;Score;Motivos;Solução;Telefone;Email',...rows.map(e=>[e.nome||e.razao,e.cnpj,e.cidade,e.uf,e.score,(e.motivosIM||[]).join(' | '),e.solucaoIM,e.tel||e.telefone,e.email].map(esc).join(';'))].join('\n'); const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'})); a.download='oportunidades_bsa_im.csv'; a.click(); URL.revokeObjectURL(a.href); }
+</script>
 </body>
 </html>
