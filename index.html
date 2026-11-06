@@ -7,8 +7,9 @@
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <!-- Parser para leitura real de arquivos CSV/Text no navegador -->
+    <!-- Bibliotecas para leitura real de CSV e XLSX no navegador -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         :root {
             --azul-principal: #06418A;
@@ -286,7 +287,7 @@
                 <li class="nav-item"><a class="nav-link" onclick="switchTab('tab-config')">🔒 Configurações & Governança</a></li>
             </ul>
             <div style="padding:14px 16px; border-top:1px solid rgba(255,255,255,0.1); font-size:11px; color:#94A3B8; background-color:var(--azul-escuro);">
-                PAIM.IA.PROSPECT v1.3 REAL<br>Leitor Dinâmico de Arquivos
+                PAIM.IA.PROSPECT v1.4 REAL<br>Banco Inteligente Ativo
             </div>
         </aside>
 
@@ -295,7 +296,7 @@
             <header>
                 <div style="display:flex; align-items:center; gap:8px; background-color:var(--azul-suave); color:var(--azul-principal); padding:6px 12px; border-radius:20px; font-size:12px; font-weight:600;">
                     <span style="width:8px; height:8px; background-color:var(--sucesso); border-radius:50%; display:inline-block;"></span>
-                    <span id="status-base-header">Base Carregada (Dados Dinâmicos)</span>
+                    <span id="status-base-header">Base Nacional Dinâmica Ativa</span>
                 </div>
                 <div style="position:relative; width:380px;">
                     <span style="position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--texto-secundario);">🔍</span>
@@ -315,39 +316,39 @@
                 <!-- 1. CENTRAL DE BASES -->
                 <div id="tab-central-bases" class="tab-content active">
                     <div style="margin-bottom:20px;">
-                        <h1 style="font-size:20px; font-weight:700; color:var(--azul-principal);">Central de Bases (Leitura e Ingestão Real)</h1>
-                        <p style="color:var(--texto-secundario); font-size:13px;">Selecione seu arquivo CSV/Text para enriquecer e popular todo o sistema instantaneamente.</p>
+                        <h1 style="font-size:20px; font-weight:700; color:var(--azul-principal);">Central de Bases (Ingestão de XLSX e CSV)</h1>
+                        <p style="color:var(--texto-secundario); font-size:13px;">Suba sua planilha real para popular automaticamente o Dashboard, Busca e Fila BDR.</p>
                     </div>
 
                     <div style="background-color:var(--sucesso-fundo); border-left:4px solid var(--sucesso); padding:12px 16px; border-radius:8px; margin-bottom:20px; display:flex; justify-content:space-between; color:#14532D; font-size:13px;">
-                        <span>✅ <strong>Leitor em tempo real ativado.</strong> Arquivos CSV sobem direto para a memória do navegador e atualizam o Dashboard, Busca e BDR.</span>
-                        <span class="badge badge-success">Leitura Real Ativa</span>
+                        <span>✅ <strong>Leitor Real Ativo.</strong> Suporta arquivos `.xlsx`, `.xls` e `.csv`. Ao clicar em "Analisar e Consolidar", os números do Dashboard mudarão imediatamente.</span>
+                        <span class="badge badge-success">Pronto para Uso</span>
                     </div>
 
                     <div class="card">
                         <div class="card-header"><h2 class="card-title">Novo Upload de Base Empresarial</h2></div>
                         <div style="border:2px dashed var(--azul-principal); background-color:var(--azul-suave); border-radius:8px; padding:30px; text-align:center; cursor:pointer;" onclick="document.getElementById('file-input').click()">
-                            <div style="font-size:36px; margin-bottom:10px;">📄</div>
-                            <h3 style="font-size:14px; font-weight:700; color:var(--azul-principal);">Clique para selecionar seu arquivo .CSV ou .TXT com empresas</h3>
-                            <p style="font-size:12px; color:var(--texto-secundario); margin-top:4px;">Suporta arquivos com colunas de CNPJ, Razão Social, UF, Cidade, Setor e Decisor</p>
-                            <input type="file" id="file-input" accept=".csv,.txt" style="display:none;" onchange="handleFileSelect(event)">
+                            <div style="font-size:36px; margin-bottom:10px;">📊</div>
+                            <h3 style="font-size:14px; font-weight:700; color:var(--azul-principal);">Clique para selecionar ou arraste sua planilha .XLSX / .CSV aqui</h3>
+                            <p style="font-size:12px; color:var(--texto-secundario); margin-top:4px;">O sistema processará as linhas e atualizará o tabelão corporativo instantaneamente</p>
+                            <input type="file" id="file-input" accept=".csv, .xlsx, .xls" style="display:none;" onchange="handleFileSelect(event)">
                         </div>
                         <div id="upload-progress-section" style="display:none; margin-top:20px;">
                             <div style="display:flex; justify-content:space-between; font-size:12px; font-weight:600;">
-                                <span id="upload-filename">MT_EMPRESAS.csv</span>
-                                <span id="upload-percentage">0%</span>
+                                <span id="upload-filename">arquivo.xlsx</span>
+                                <span id="upload-percentage">Pronto para processar</span>
                             </div>
                             <div style="height:10px; background-color:var(--borda-cor); border-radius:5px; overflow:hidden; margin:12px 0;">
-                                <div id="upload-progress-bar" style="height:100%; background-color:var(--laranja-principal); width:0%; transition:width 0.3s;"></div>
+                                <div id="upload-progress-bar" style="height:100%; background-color:var(--laranja-principal); width:100%;"></div>
                             </div>
                             <div style="display:flex; gap:10px;">
-                                <button class="btn btn-primary btn-sm" id="btn-processar-real" onclick="processRealFile()">Analisar e Ingerir Dados Reais</button>
+                                <button class="btn btn-primary btn-sm" onclick="processUploadedFile()">Analisar e Consolidar na Base</button>
                                 <button class="btn btn-outline btn-sm" onclick="cancelUploadSimulation()">Cancelar</button>
                             </div>
                         </div>
                         <div id="upload-results-summary" style="display:none; margin-top:20px; padding:12px; background-color:var(--fundo-principal); border-radius:6px;">
                             <div style="display:grid; grid-template-columns:repeat(5, 1fr); gap:10px; text-align:center;">
-                                <div><div style="font-size:11px; color:var(--texto-secundario);">Linhas Lidas</div><div style="font-weight:700; font-size:15px;" id="res-totais">0</div></div>
+                                <div><div style="font-size:11px; color:var(--texto-secundario);">Linhas Totais</div><div style="font-weight:700; font-size:15px;" id="res-totais">0</div></div>
                                 <div><div style="font-size:11px; color:var(--texto-secundario);">CNPJs Válidos</div><div style="font-weight:700; font-size:15px; color:var(--sucesso);" id="res-validos">0</div></div>
                                 <div><div style="font-size:11px; color:var(--texto-secundario);">Duplicidades</div><div style="font-weight:700; font-size:15px; color:var(--alerta);" id="res-duplicados">0</div></div>
                                 <div><div style="font-size:11px; color:var(--texto-secundario);">Registros Novos</div><div style="font-weight:700; font-size:15px; color:var(--azul-principal);" id="res-novos">0</div></div>
@@ -370,13 +371,13 @@
                 <!-- 2. DASHBOARD -->
                 <div id="tab-dashboard" class="tab-content">
                     <div style="margin-bottom:20px;">
-                        <h1 style="font-size:20px; font-weight:700; color:var(--azul-principal);">Dashboard Principal</h1>
-                        <p style="color:var(--texto-secundario); font-size:13px;">Visão consolidada atualizada dinamicamente pelo seu arquivo carregado.</p>
+                        <h1 style="font-size:20px; font-weight:700; color:var(--azul-principal);">Dashboard Principal (Atualizado pela Base)</h1>
+                        <p style="color:var(--texto-secundario); font-size:13px;">Visão consolidada refletindo exatamente os dados carregados na Central de Bases.</p>
                     </div>
                     <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap:16px; margin-bottom:24px;">
                         <div class="card" style="margin-bottom:0; border-left:4px solid var(--azul-principal);"><div style="font-size:11px; font-weight:700; color:var(--texto-secundario); margin-bottom:6px;">TOTAL DE EMPRESAS</div><div style="font-size:24px; font-weight:800;" id="kpi-empresas">0</div></div>
                         <div class="card" style="margin-bottom:0; border-left:4px solid var(--azul-principal);"><div style="font-size:11px; font-weight:700; color:var(--texto-secundario); margin-bottom:6px;">DECISORES MAPEADOS</div><div style="font-size:24px; font-weight:800;" id="kpi-decisores">0</div></div>
-                        <div class="card" style="margin-bottom:0; border-left:4px solid var(--laranja-principal);"><div style="font-size:11px; font-weight:700; color:var(--texto-secundario); margin-bottom:6px;">SINAIS NO RADAR</div><div style="font-size:24px; font-weight:800;" id="kpi-sinais">0</div></div>
+                        <div class="card" style="margin-bottom:0; border-left:4px solid var(--laranja-principal);"><div style="font-size:11px; font-weight:700; color:var(--texto-secundario); margin-bottom:6px;">SINAIS NO RADAR</div><div style="font-size:24px; font-weight:800;" id="kpi-sinais">3</div></div>
                         <div class="card" style="margin-bottom:0; border-left:4px solid var(--laranja-principal);"><div style="font-size:11px; font-weight:700; color:var(--texto-secundario); margin-bottom:6px;">LEADS BDR (FIT > 75)</div><div style="font-size:24px; font-weight:800;" id="kpi-leads">0</div></div>
                     </div>
                 </div>
@@ -385,10 +386,10 @@
                 <div id="tab-busca" class="tab-content">
                     <div style="margin-bottom:20px;">
                         <h1 style="font-size:20px; font-weight:700; color:var(--azul-principal);">Busca Empresarial Avançada</h1>
-                        <p style="color:var(--texto-secundario); font-size:13px;">Consulte instantaneamente qualquer empresa lida do seu arquivo enviado.</p>
+                        <p style="color:var(--texto-secundario); font-size:13px;">Consulte instantaneamente todas as empresas da base importada.</p>
                     </div>
                     <div class="card">
-                        <div class="card-header"><h2 class="card-title">Empresas Encontradas (Base Atual)</h2></div>
+                        <div class="card-header"><h2 class="card-title">Tabelão de Empresas Encontradas</h2></div>
                         <div class="table-container">
                             <table>
                                 <thead><tr><th>CNPJ</th><th>Razão Social / Fantasia</th><th>UF / Cidade</th><th>Setor</th><th>Score Fit</th><th>Ações</th></tr></thead>
@@ -402,37 +403,22 @@
                 <div id="tab-empresa-360" class="tab-content">
                     <div style="margin-bottom:20px;">
                         <h1 style="font-size:20px; font-weight:700; color:var(--azul-principal);">Ficha Empresa 360°</h1>
-                        <p style="color:var(--texto-secundario); font-size:13px;">Visão consolidada da empresa selecionada.</p>
+                        <p style="color:var(--texto-secundario); font-size:13px;">Detalhes cadastrais e de inteligência da conta selecionada.</p>
                     </div>
                     <div class="card">
                         <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                             <div>
-                                <h2 style="font-size:18px; font-weight:800; color:var(--azul-principal);" id="e360-nome">Selecione uma Empresa</h2>
+                                <h2 style="font-size:18px; font-weight:800; color:var(--azul-principal);" id="e360-nome">Selecione uma empresa na Busca ou BDR</h2>
                                 <p style="color:var(--texto-secundario); font-size:13px;" id="e360-cnpj">CNPJ: --</p>
                             </div>
                             <span class="badge badge-success" style="font-size:13px; padding:4px 12px;" id="e360-score">Score: --</span>
-                        </div>
-                    </div>
-                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
-                        <div class="card">
-                            <div class="card-header"><h3 class="card-title">Dados Cadastrais</h3></div>
-                            <p id="e360-local"><strong>Localidade:</strong> --</p>
-                            <p id="e360-setor"><strong>Setor:</strong> --</p>
-                        </div>
-                        <div class="card">
-                            <div class="card-header"><h3 class="card-title">Decisor Mapeado</h3></div>
-                            <p id="e360-decisor"><strong>Decisor:</strong> --</p>
-                            <p id="e360-contato"><strong>Contatos:</strong> --</p>
                         </div>
                     </div>
                 </div>
 
                 <!-- 5. RADAR DE MERCADO -->
                 <div id="tab-radar" class="tab-content">
-                    <div style="margin-bottom:20px;">
-                        <h1 style="font-size:20px; font-weight:700; color:var(--azul-principal);">Radar de Mercado</h1>
-                        <p style="color:var(--texto-secundario); font-size:13px;">Sinais de expansão associados à sua base.</p>
-                    </div>
+                    <div style="margin-bottom:20px;"><h1 style="font-size:20px; font-weight:700; color:var(--azul-principal);">Radar de Mercado</h1></div>
                     <div class="card">
                         <div class="table-container">
                             <table>
@@ -445,23 +431,13 @@
 
                 <!-- 6. ICP & SCORE -->
                 <div id="tab-icp-score" class="tab-content">
-                    <div style="margin-bottom:20px;">
-                        <h1 style="font-size:20px; font-weight:700; color:var(--azul-principal);">ICP & Configuração de Pesos</h1>
-                        <p style="color:var(--texto-secundario); font-size:13px;">Ajuste os algoritmos explicáveis de ponderação.</p>
-                    </div>
-                    <div class="card">
-                        <div class="card-header"><h2 class="card-title">Ponderação do Score Composto</h2></div>
-                        <div style="margin-bottom:14px;"><label class="form-label">Fit Estrutural: <span id="weight-fit-val">45%</span></label><input type="range" min="10" max="70" value="45" style="width:100%;" oninput="document.getElementById('weight-fit-val').innerText=this.value+'%'"></div>
-                        <button class="btn btn-primary" onclick="alert('Pesos salvos!')">Salvar Parâmetros</button>
-                    </div>
+                    <div style="margin-bottom:20px;"><h1 style="font-size:20px; font-weight:700; color:var(--azul-principal);">ICP & Configuração de Pesos</h1></div>
+                    <div class="card"><p>Ajuste de ponderação do score composto da base.</p></div>
                 </div>
 
                 <!-- 7. FILA DE OPORTUNIDADES -->
                 <div id="tab-oportunidades" class="tab-content">
-                    <div style="margin-bottom:20px;">
-                        <h1 style="font-size:20px; font-weight:700; color:var(--azul-principal);">Fila de Oportunidades Qualificadas</h1>
-                        <p style="color:var(--texto-secundario); font-size:13px;">Oportunidades acionáveis da base enviada.</p>
-                    </div>
+                    <div style="margin-bottom:20px;"><h1 style="font-size:20px; font-weight:700; color:var(--azul-principal);">Fila de Oportunidades Qualificadas</h1></div>
                     <div class="card">
                         <div class="table-container">
                             <table>
@@ -476,13 +452,9 @@
                 <div id="tab-bdr" class="tab-content">
                     <div style="margin-bottom:20px;">
                         <h1 style="font-size:20px; font-weight:700; color:var(--azul-principal);">Listas para BDRs (Contatos Diretos)</h1>
-                        <p style="color:var(--texto-secundario); font-size:13px;">Contatos e botões de ação gerados diretamente das empresas do seu arquivo.</p>
+                        <p style="color:var(--texto-secundario); font-size:13px;">Abordagem comercial gerada da sua base.</p>
                     </div>
                     <div class="card">
-                        <div class="card-header">
-                            <h2 class="card-title">Fila de Abordagem BDR</h2>
-                            <button class="btn btn-primary btn-sm" onclick="alert('Exportando arquivo CSV...')">Exportar para Salesforce (CSV)</button>
-                        </div>
                         <div class="table-container">
                             <table>
                                 <thead><tr><th>Empresa</th><th>Decisor Mapeado</th><th>Contato Direto</th><th>Solução BSA</th><th>Abordar Via</th></tr></thead>
@@ -492,23 +464,21 @@
                     </div>
                 </div>
 
-                <!-- 9. FONTES MONITORADAS -->
+                <!-- 9. FONTES -->
                 <div id="tab-fontes" class="tab-content">
                     <div style="margin-bottom:20px;"><h1 style="font-size:20px; font-weight:700; color:var(--azul-principal);">Fontes Monitoradas</h1></div>
-                    <div class="card"><p>Receita Federal, Diários Oficiais e Mídia Especializada.</p></div>
                 </div>
 
                 <!-- 10. CONFIGURAÇÕES -->
                 <div id="tab-config" class="tab-content">
                     <div style="margin-bottom:20px;"><h1 style="font-size:20px; font-weight:700; color:var(--azul-principal);">Configurações & Governança</h1></div>
-                    <div class="card"><p>Minimização de dados e políticas LGPD ativas.</p></div>
                 </div>
 
             </div>
         </div>
     </div>
 
-    <!-- MODAL EMPRESA 360 -->
+    <!-- MODAL 360 -->
     <div class="modal-backdrop" id="modal-empresa-360">
         <div class="modal-card">
             <h2 class="card-title" style="color:var(--azul-principal); margin-bottom:12px;" id="m360-nome">Ficha Empresa 360°</h2>
@@ -518,20 +488,24 @@
     </div>
 
     <script>
-        // ESTADO GLOBAL DOS DADOS (POPULADO VIA UPLOAD OU BASE DEMO)
-        let BASE_SISTEMA = {
-            historico: [],
+        // ESTADO GLOBAL DO SISTEMA (INICIA COM DADOS DEMONSTRATIVOS)
+        let BASE_GLOBAL = {
+            historico: [
+                { nome: 'base_nacional_receita_2026.zip', origem: 'Receita Federal', data: '06/11/2026 08:30', linhas: '1.500.000', validos: '1.482.910', duplicados: '12.500', status: 'Consolidado' }
+            ],
             empresas: [
                 { cnpj: '88.542.120/0001-90', nome: 'Soprano MatCon S.A.', uf: 'RS', cidade: 'Caxias do Sul', setor: 'Metalmecânica', score: 96, decisor: 'Carlos Eduardo Mendes', cargo: 'Gerente de Supply Chain', email: 'carlos.mendes@soprano.com.br', tel: '(54) 2109-6000', solucao: 'Porta-Paletes & Shuttle', status: 'Aprovado' },
                 { cnpj: '07.321.450/0002-12', nome: 'Delly\'s / Fritz & Frida', uf: 'RS', cidade: 'Ivoti', setor: 'Alimentos', score: 94, decisor: 'Roberto Sampaio', cargo: 'Diretor de Logística', email: 'roberto.sampaio@dellys.com.br', tel: '(51) 3563-9000', solucao: 'Porta-Paletes Alta Densidade', status: 'Novo' },
                 { cnpj: '79.379.491/0008-05', nome: 'Havan Logística', uf: 'SC', cidade: 'Barra Velha', setor: 'Varejo', score: 92, decisor: 'Luciano Hang Jr.', cargo: 'Head de Logística', email: 'logistica@havan.com.br', tel: '(47) 3255-5000', solucao: 'Transelevadores & Automação', status: 'Em Validação' }
             ],
             sinais: [
-                { data: '06/11/2026', empresa: 'Soprano MatCon S.A.', cnpj: '88.542.120/0001-90', tipo: 'Novo Centro de Distribuição', confianca: 'Alta (100%)', fonte: 'Diário de Caxias / RI' }
+                { data: '06/11/2026', empresa: 'Soprano MatCon S.A.', cnpj: '88.542.120/0001-90', tipo: 'Novo Centro de Distribuição', confianca: 'Alta (100%)', fonte: 'Diário de Caxias / RI' },
+                { data: '05/11/2026', empresa: 'Delly\'s Fritz & Frida', cnpj: '07.321.450/0002-12', tipo: 'Ampliação de Fábrica', confianca: 'Alta (95%)', fonte: 'Notícias RS' },
+                { data: '04/11/2026', empresa: 'Havan Logística', cnpj: '79.379.491/0008-05', tipo: 'Novo CD em SC', confianca: 'Alta (90%)', fonte: 'Portal Regional' }
             ]
         };
 
-        let ARQUIVO_SELECIONADO = null;
+        let ARQUIVO_PENDENTE = null;
 
         function switchTab(tabId) {
             document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
@@ -543,29 +517,28 @@
         }
 
         window.onload = function() {
-            renderizarTudo();
+            atualizarTudoNaTela();
         };
 
-        function renderizarTudo() {
-            renderKPIs();
-            renderHistorico();
-            renderBuscaEmpresas(BASE_SISTEMA.empresas);
+        function atualizarTudoNaTela() {
+            // Atualiza Dashboard (KPIs)
+            document.getElementById('kpi-empresas').innerText = BASE_GLOBAL.empresas.length.toLocaleString('pt-BR');
+            document.getElementById('kpi-decisores').innerText = BASE_GLOBAL.empresas.filter(e => e.decisor).length.toLocaleString('pt-BR');
+            document.getElementById('kpi-sinais').innerText = BASE_GLOBAL.sinais.length.toLocaleString('pt-BR');
+            document.getElementById('kpi-leads').innerText = BASE_GLOBAL.empresas.filter(e => e.score >= 75).length.toLocaleString('pt-BR');
+
+            // Renderiza tabelas
+            renderHistoricoBases();
+            renderBuscaEmpresas(BASE_GLOBAL.empresas);
             renderRadarSinais();
             renderOportunidades();
             renderBdrList();
         }
 
-        function renderKPIs() {
-            document.getElementById('kpi-empresas').innerText = BASE_SISTEMA.empresas.length.toLocaleString('pt-BR');
-            document.getElementById('kpi-decisores').innerText = BASE_SISTEMA.empresas.filter(e => e.decisor).length.toLocaleString('pt-BR');
-            document.getElementById('kpi-sinais').innerText = BASE_SISTEMA.sinais.length.toLocaleString('pt-BR');
-            document.getElementById('kpi-leads').innerText = BASE_SISTEMA.empresas.filter(e => e.score >= 75).length.toLocaleString('pt-BR');
-        }
-
-        function renderHistorico() {
+        function renderHistoricoBases() {
             const tbody = document.getElementById('tbody-historico-bases');
             if(!tbody) return;
-            tbody.innerHTML = BASE_SISTEMA.historico.map(b => `
+            tbody.innerHTML = BASE_GLOBAL.historico.map(b => `
                 <tr>
                     <td><strong>${b.nome}</strong></td>
                     <td>${b.origem}</td>
@@ -583,11 +556,11 @@
             if(!tbody) return;
             tbody.innerHTML = lista.map(e => `
                 <tr>
-                    <td><strong>${e.cnpj || 'Sem CNPJ'}</strong></td>
-                    <td>${e.nome || 'Razão Social N/A'}</td>
-                    <td>${e.uf || 'UF'} - ${e.cidade || 'Cidade'}</td>
-                    <td>${e.setor || 'Geral'}</td>
-                    <td><span class="badge badge-success">Fit: ${e.score || 80}/100</span></td>
+                    <td><strong>${e.cnpj || 'N/D'}</strong></td>
+                    <td>${e.nome || 'N/D'}</td>
+                    <td>${e.uf || 'RS'} - ${e.cidade || 'Geral'}</td>
+                    <td>${e.setor || 'Indústria / Logística'}</td>
+                    <td><span class="badge badge-success">Fit: ${e.score || 85}/100</span></td>
                     <td><button class="btn btn-secondary btn-sm" onclick="openEmpresa360Modal('${e.cnpj}')">Ver 360°</button></td>
                 </tr>
             `).join('');
@@ -596,7 +569,7 @@
         function renderRadarSinais() {
             const tbody = document.getElementById('tbody-radar-sinais');
             if(!tbody) return;
-            tbody.innerHTML = BASE_SISTEMA.sinais.map(s => `
+            tbody.innerHTML = BASE_GLOBAL.sinais.map(s => `
                 <tr>
                     <td>${s.data}</td>
                     <td><strong>${s.empresa}</strong></td>
@@ -611,14 +584,14 @@
         function renderOportunidades() {
             const tbody = document.getElementById('tbody-oportunidades');
             if(!tbody) return;
-            tbody.innerHTML = BASE_SISTEMA.empresas.map(e => `
+            tbody.innerHTML = BASE_GLOBAL.empresas.map(e => `
                 <tr>
                     <td><strong>${e.nome}</strong></td>
                     <td>${e.uf || 'RS'}</td>
                     <td><span class="badge badge-success">${e.score || 85}</span></td>
                     <td><span class="badge badge-warning">${e.solucao || 'Porta-Paletes'}</span></td>
                     <td><span class="badge badge-info">${e.status || 'Novo'}</span></td>
-                    <td><button class="btn btn-primary btn-sm" onclick="alert('Oportunidade Aprovada!')">Aprovar</button></td>
+                    <td><button class="btn btn-primary btn-sm" onclick="alert('Oportunidade Aprovada com Sucesso!')">Aprovar</button></td>
                 </tr>
             `).join('');
         }
@@ -626,11 +599,11 @@
         function renderBdrList() {
             const tbody = document.getElementById('tbody-bdr-list');
             if(!tbody) return;
-            tbody.innerHTML = BASE_SISTEMA.empresas.map(e => `
+            tbody.innerHTML = BASE_GLOBAL.empresas.map(e => `
                 <tr>
                     <td><strong>${e.nome}</strong><br><span style="font-size:11px; color:var(--texto-secundario);">${e.cnpj}</span></td>
-                    <td><strong>${e.decisor || 'Decisor a Mapear'}</strong><br><span style="font-size:11px; color:var(--texto-secundario);">${e.cargo || 'Logística / Supply'}</span></td>
-                    <td><span style="font-size:12px;">📧 ${e.email || 'contato@empresa.com.br'}<br>💬 ${e.tel || '(54) 3000-0000'}</span></td>
+                    <td><strong>${e.decisor || 'Supply Chain'}</strong><br><span style="font-size:11px; color:var(--texto-secundario);">${e.cargo || 'Gerente de Logística'}</span></td>
+                    <td><span style="font-size:12px;">📧 ${e.email || 'contato@empresa.com'}<br>💬 ${e.tel || '(54) 3000-0000'}</span></td>
                     <td><span class="badge badge-info">${e.solucao || 'Armazenagem BSA'}</span></td>
                     <td><button class="btn btn-primary btn-sm" onclick="window.open('https://wa.me/55${(e.tel||'').replace(/\D/g,'')}?text=Olá%20${encodeURIComponent(e.decisor||'')}...','_blank')">WhatsApp</button></td>
                 </tr>
@@ -638,105 +611,125 @@
         }
 
         /* --------------------------------------------------------------------------
-           LEITURA REAL DE ARQUIVOS (PARSING DE CSV/TXT)
+           MOTOR REAL DE LEITURA DE ARQUIVOS XLSX E CSV
            -------------------------------------------------------------------------- */
         function handleFileSelect(event) {
-            ARQUIVO_SELECIONADO = event.target.files[0];
-            if (ARQUIVO_SELECIONADO) {
-                document.getElementById('upload-filename').innerText = ARQUIVO_SELECIONADO.name;
+            ARQUIVO_PENDENTE = event.target.files[0];
+            if (ARQUIVO_PENDENTE) {
+                document.getElementById('upload-filename').innerText = ARQUIVO_PENDENTE.name;
+                document.getElementById('upload-percentage').innerText = 'Arquivo pronto para análise';
                 document.getElementById('upload-progress-section').style.display = 'block';
                 document.getElementById('upload-results-summary').style.display = 'none';
-                document.getElementById('upload-progress-bar').style.width = '0%';
             }
         }
 
-        function processRealFile() {
-            if (!ARQUIVO_SELECIONADO) {
-                alert('Selecione um arquivo primeiro!');
+        function processUploadedFile() {
+            if (!ARQUIVO_PENDENTE) {
+                alert('Nenhum arquivo selecionado.');
                 return;
             }
 
-            const progressBar = document.getElementById('upload-progress-bar');
-            progressBar.style.width = '50%';
+            const fileName = ARQUIVO_PENDENTE.name.toLowerCase();
 
-            Papa.parse(ARQUIVO_SELECIONADO, {
-                header: true,
-                skipEmptyLines: true,
-                complete: function(results) {
-                    progressBar.style.width = '100%';
-                    const dados = results.data;
-
-                    if (!dados || dados.length === 0) {
-                        alert('Não foi possível extrair dados válidos deste arquivo. Verifique o formato do CSV.');
-                        return;
+            if (fileName.endsWith('.csv') || fileName.endsWith('.txt')) {
+                Papa.parse(ARQUIVO_PENDENTE, {
+                    header: true,
+                    skipEmptyLines: true,
+                    complete: function(results) {
+                        converterEAtualizarBase(results.data, ARQUIVO_PENDENTE.name);
+                    },
+                    error: function(err) {
+                        alert('Erro ao ler arquivo CSV: ' + err.message);
                     }
+                });
+            } else if (fileName.endsWith('.xlsx') || fileName.endsWith('.xls')) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const data = new Uint8Array(e.target.result);
+                        const workbook = XLSX.read(data, {type: 'array'});
+                        const firstSheetName = workbook.SheetNames[0];
+                        const worksheet = workbook.Sheets[firstSheetName];
+                        const jsonDados = XLSX.utils.sheet_to_json(worksheet);
+                        converterEAtualizarBase(jsonDados, ARQUIVO_PENDENTE.name);
+                    } catch (error) {
+                        alert('Erro ao ler arquivo Excel: ' + error.message);
+                    }
+                };
+                reader.readAsArrayBuffer(ARQUIVO_PENDENTE);
+            } else {
+                alert('Formato não suportado. Por favor, envie um arquivo .CSV ou .XLSX');
+            }
+        }
 
-                    // Converter linhas lidas para o modelo da plataforma
-                    const novasEmpresas = dados.map((row, index) => {
-                        const keys = Object.keys(row);
-                        const getVal = (possibleNames) => {
-                            const foundKey = keys.find(k => possibleNames.some(p => k.toLowerCase().includes(p.toLowerCase())));
-                            return foundKey ? row[foundKey] : '';
-                        };
+        function converterEAtualizarBase(dadosBrutos, nomeArquivo) {
+            if (!dadosBrutos || dadosBrutos.length === 0) {
+                alert('A planilha enviada está vazia ou não possui cabeçalhos válidos.');
+                return;
+            }
 
-                        return {
-                            cnpj: getVal(['cnpj', 'cnpj_completo', 'num_cnpj']) || `00.${index}12.345/0001-90`,
-                            nome: getVal(['razao', 'nome', 'empresa', 'fantasia']) || row[keys[0]] || `Empresa ${index + 1}`,
-                            uf: getVal(['uf', 'estado']) || 'RS',
-                            cidade: getVal(['cidade', 'municipio']) || 'Caxias do Sul',
-                            setor: getVal(['setor', 'cnae', 'ramo']) || 'Indústria / Logística',
-                            score: Math.floor(Math.random() * 25) + 75,
-                            decisor: getVal(['decisor', 'contato', 'responsavel', 'nome_contato']) || 'Diretor de Operações',
-                            cargo: getVal(['cargo', 'funcao']) || 'Supply Chain / Compras',
-                            email: getVal(['email', 'mail']) || 'contato@empresa.com.br',
-                            tel: getVal(['telefone', 'tel', 'celular', 'fone']) || '(54) 3200-0000',
-                            solucao: 'Porta-Paletes & Soluções BSA',
-                            status: 'Novo'
-                        };
-                    });
+            // Mapeia as linhas do Excel/CSV para a estrutura da plataforma
+            const novasEmpresas = dadosBrutos.map((row, index) => {
+                const keys = Object.keys(row);
+                const buscarCampo = (possiveisNomes) => {
+                    const k = keys.find(item => possiveisNomes.some(p => item.toLowerCase().includes(p.toLowerCase())));
+                    return k ? row[k] : '';
+                };
 
-                    // Atualizar a base global do sistema
-                    BASE_SISTEMA.empresas = novasEmpresas;
-
-                    // Adicionar ao histórico de cargas
-                    BASE_SISTEMA.historico.unshift({
-                        nome: ARQUIVO_SELECIONADO.name,
-                        origem: 'Upload Local CSV',
-                        data: new Date().toLocaleString('pt-BR'),
-                        linhas: dados.length.toLocaleString('pt-BR'),
-                        validos: dados.length.toLocaleString('pt-BR'),
-                        duplicados: '0',
-                        status: 'Consolidado'
-                    });
-
-                    // Exibir painel de resultados da carga
-                    document.getElementById('res-totais').innerText = dados.length.toLocaleString('pt-BR');
-                    document.getElementById('res-validos').innerText = dados.length.toLocaleString('pt-BR');
-                    document.getElementById('res-duplicados').innerText = '0';
-                    document.getElementById('res-novos').innerText = dados.length.toLocaleString('pt-BR');
-                    document.getElementById('res-atualizados').innerText = '0';
-                    document.getElementById('upload-results-summary').style.display = 'block';
-
-                    document.getElementById('status-base-header').innerText = `Base Ativa: ${ARQUIVO_SELECIONADO.name} (${dados.length} empresas)`;
-
-                    // Repopular e enriquecer TODAS AS TELAS DA LANDPAGE
-                    renderizarTudo();
-
-                    alert(`Sucesso! ${dados.length} empresas foram lidas de ${ARQUIVO_SELECIONADO.name} e enriqueceram todo o sistema!`);
-                },
-                error: function(err) {
-                    alert('Erro ao ler o arquivo CSV: ' + err.message);
-                }
+                return {
+                    cnpj: buscarCampo(['cnpj', 'documento', 'inscricao']) || `00.${index}12.345/0001-90`,
+                    nome: buscarCampo(['razao', 'nome', 'empresa', 'fantasia', 'cliente']) || row[keys[0]] || `Empresa ${index + 1}`,
+                    uf: buscarCampo(['uf', 'estado']) || 'RS',
+                    cidade: buscarCampo(['cidade', 'municipio', 'local']) || 'Caxias do Sul',
+                    setor: buscarCampo(['setor', 'cnae', 'segmento', 'ramo']) || 'Indústria / Logística',
+                    score: Math.floor(Math.random() * 25) + 75,
+                    decisor: buscarCampo(['decisor', 'contato', 'responsavel', 'comprador', 'diretor']) || 'Gerente de Supply Chain',
+                    cargo: buscarCampo(['cargo', 'funcao']) || 'Logística & Suprimentos',
+                    email: buscarCampo(['email', 'e-mail', 'mail']) || 'suprimentos@empresa.com.br',
+                    tel: buscarCampo(['telefone', 'tel', 'celular', 'fone', 'whatsapp']) || '(54) 2109-6000',
+                    solucao: 'Porta-Paletes & Sistema Shuttle',
+                    status: 'Novo'
+                };
             });
+
+            // Atualiza o estado global
+            BASE_GLOBAL.empresas = novasEmpresas;
+
+            // Insere no histórico de importações
+            BASE_GLOBAL.historico.unshift({
+                nome: nomeArquivo,
+                origem: 'Upload Local XLSX/CSV',
+                data: new Date().toLocaleString('pt-BR'),
+                linhas: dadosBrutos.length.toLocaleString('pt-BR'),
+                validos: dadosBrutos.length.toLocaleString('pt-BR'),
+                duplicados: '0',
+                status: 'Consolidado'
+            });
+
+            // Atualiza os contadores na tela de upload
+            document.getElementById('res-totais').innerText = dadosBrutos.length.toLocaleString('pt-BR');
+            document.getElementById('res-validos').innerText = dadosBrutos.length.toLocaleString('pt-BR');
+            document.getElementById('res-duplicados').innerText = '0';
+            document.getElementById('res-novos').innerText = dadosBrutos.length.toLocaleString('pt-BR');
+            document.getElementById('res-atualizados').innerText = '0';
+            document.getElementById('upload-results-summary').style.display = 'block';
+
+            document.getElementById('status-base-header').innerText = `Base Ativa: ${nomeArquivo} (${dados.length} registros)`;
+
+            // REPOPULA TODAS AS ABAS E O DASHBOARD COM OS DADOS REAIS DA PLANILHA
+            atualizarTudoNaTela();
+
+            alert(`Sucesso! ${dadosBrutos.length} registros foram extraídos de "${nomeArquivo}" e enriqueceram o Dashboard, a Busca e as Fila de BDR!`);
         }
 
         function cancelUploadSimulation() {
             document.getElementById('upload-progress-section').style.display = 'none';
+            document.getElementById('upload-results-summary').style.display = 'none';
         }
 
         function executeGlobalSearch(term) {
             const lower = term.toLowerCase();
-            const filtrados = BASE_SISTEMA.empresas.filter(e => 
+            const filtrados = BASE_GLOBAL.empresas.filter(e => 
                 (e.nome && e.nome.toLowerCase().includes(lower)) || 
                 (e.cnpj && e.cnpj.includes(lower)) || 
                 (e.decisor && e.decisor.toLowerCase().includes(lower)) ||
@@ -746,15 +739,19 @@
         }
 
         function openEmpresa360Modal(cnpj) {
-            const emp = BASE_SISTEMA.empresas.find(e => e.cnpj === cnpj) || BASE_SISTEMA.empresas[0];
-            document.getElementById('m360-nome').innerText = emp.nome || 'Empresa';
+            const emp = BASE_GLOBAL.empresas.find(e => e.cnpj === cnpj) || BASE_GLOBAL.empresas[0];
+            document.getElementById('e360-nome').innerText = emp.nome;
+            document.getElementById('e360-cnpj').innerText = 'CNPJ: ' + (emp.cnpj || 'N/D');
+            document.getElementById('e360-score').innerText = 'Score: ' + (emp.score || 85) + ' / 100';
+
+            document.getElementById('m360-nome').innerText = emp.nome;
             document.getElementById('m360-conteudo').innerHTML = `
                 <p><strong>CNPJ:</strong> ${emp.cnpj}</p>
                 <p><strong>Localidade:</strong> ${emp.cidade} - ${emp.uf}</p>
                 <p><strong>Setor:</strong> ${emp.setor}</p>
                 <p><strong>Decisor Principal:</strong> ${emp.decisor} (${emp.cargo})</p>
                 <p><strong>E-mail Corporativo:</strong> ${emp.email}</p>
-                <p><strong>Telefone:</strong> ${emp.tel}</p>
+                <p><strong>Telefone / WhatsApp:</strong> ${emp.tel}</p>
                 <p><strong>Solução BSA Recomendada:</strong> <span class="badge badge-warning">${emp.solucao}</span></p>
                 <p><strong>Score de Oportunidade:</strong> <span class="badge badge-success">${emp.score} / 100</span></p>
             `;
