@@ -285,7 +285,7 @@
                 <li class="nav-item"><a class="nav-link" onclick="switchTab('tab-config')">🔒 Configurações & Governança</a></li>
             </ul>
             <div style="padding:14px 16px; border-top:1px solid rgba(255,255,255,0.1); font-size:11px; color:#94A3B8; background-color:var(--azul-escuro);">
-                PAIM.IA.PROSPECT v1.1 MVP<br>Protótipo Front-end Funcional
+                PAIM.IA.PROSPECT v1.2 NACIONAL<br>Banco Gigante Inteligente
             </div>
         </aside>
 
@@ -294,11 +294,11 @@
             <header>
                 <div style="display:flex; align-items:center; gap:8px; background-color:var(--azul-suave); color:var(--azul-principal); padding:6px 12px; border-radius:20px; font-size:12px; font-weight:600;">
                     <span style="width:8px; height:8px; background-color:var(--sucesso); border-radius:50%; display:inline-block;"></span>
-                    <span>Protótipo Front-end Local Conectado</span>
+                    <span>Base Nacional Consolidada Ativa</span>
                 </div>
                 <div style="position:relative; width:380px;">
                     <span style="position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--texto-secundario);">🔍</span>
-                    <input type="text" id="global-search-input" placeholder="Buscar CNPJ, Razão Social ou Decisor..." style="width:100%; padding:8px 12px 8px 36px; border-radius:6px; border:1px solid var(--borda-cor); font-size:13px; outline:none;" oninput="executeGlobalSearch(this.value)">
+                    <input type="text" id="global-search-input" placeholder="Buscar CNPJ, Razão Social ou Decisor (Supply/Compras)..." style="width:100%; padding:8px 12px 8px 36px; border-radius:6px; border:1px solid var(--borda-cor); font-size:13px; outline:none;" oninput="executeGlobalSearch(this.value)">
                 </div>
                 <div style="display:flex; align-items:center; gap:12px;">
                     <div style="width:34px; height:34px; border-radius:50%; background-color:var(--azul-principal); color:var(--branco); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:13px;">BSA</div>
@@ -314,44 +314,44 @@
                 <!-- 1. CENTRAL DE BASES -->
                 <div id="tab-central-bases" class="tab-content active">
                     <div style="margin-bottom:20px;">
-                        <h1 style="font-size:20px; font-weight:700; color:var(--azul-principal);">Central de Bases</h1>
-                        <p style="color:var(--texto-secundario); font-size:13px;">Ingestão, validação, padronização e deduplicação de dados cadastrais empresariais massivos.</p>
+                        <h1 style="font-size:20px; font-weight:700; color:var(--azul-principal);">Central de Bases (Escala Nacional)</h1>
+                        <p style="color:var(--texto-secundario); font-size:13px;">Ingestão, validação, padronização e deduplicação de bases massivas de CNPJs do Brasil.</p>
                     </div>
 
                     <div style="background-color:var(--alerta-fundo); border-left:4px solid var(--alerta); padding:12px 16px; border-radius:8px; margin-bottom:20px; display:flex; justify-content:space-between; color:#92400E; font-size:13px;">
-                        <span>⚠️ <strong>Simulação local do front-end.</strong> O processamento massivo dependerá da futura conexão com o back-end (Python/FastAPI/PostgreSQL).</span>
-                        <span class="badge badge-warning">Simulação</span>
+                        <span>⚠️ <strong>Simulação local do front-end.</strong> O processamento em background de milhões de registros opera via arquitetura FastAPI/PostgreSQL.</span>
+                        <span class="badge badge-warning">Simulação Ativa</span>
                     </div>
 
                     <div class="card">
-                        <div class="card-header"><h2 class="card-title">Novo Upload de Base Empresarial</h2></div>
+                        <div class="card-header"><h2 class="card-title">Novo Upload de Base de CNPJs (Nacional)</h2></div>
                         <div style="border:2px dashed var(--azul-principal); background-color:var(--azul-suave); border-radius:8px; padding:30px; text-align:center; cursor:pointer;" onclick="document.getElementById('file-input').click()">
                             <div style="font-size:36px; margin-bottom:10px;">📄</div>
-                            <h3 style="font-size:14px; font-weight:700; color:var(--azul-principal);">Clique para selecionar ou arraste o arquivo aqui</h3>
-                            <p style="font-size:12px; color:var(--texto-secundario); margin-top:4px;">Suporta arquivos <strong>.CSV, .XLSX ou .ZIP</strong></p>
+                            <h3 style="font-size:14px; font-weight:700; color:var(--azul-principal);">Clique para selecionar ou arraste o arquivo .CSV / .XLSX / .ZIP aqui</h3>
+                            <p style="font-size:12px; color:var(--texto-secundario); margin-top:4px;">Suporta pacotes massivos da Receita Federal e bases estaduais</p>
                             <input type="file" id="file-input" style="display:none;" onchange="handleFileSelect(event)">
                         </div>
                         <div id="upload-progress-section" style="display:none; margin-top:20px;">
                             <div style="display:flex; justify-content:space-between; font-size:12px; font-weight:600;">
-                                <span id="upload-filename">base_receita_federal_amostra.csv</span>
+                                <span id="upload-filename">base_nacional_receita_2026.zip</span>
                                 <span id="upload-percentage">0%</span>
                             </div>
                             <div style="height:10px; background-color:var(--borda-cor); border-radius:5px; overflow:hidden; margin:12px 0;">
                                 <div id="upload-progress-bar" style="height:100%; background-color:var(--laranja-principal); width:0%; transition:width 0.3s;"></div>
                             </div>
                             <div style="display:flex; gap:10px;">
-                                <button class="btn btn-primary btn-sm" onclick="processUploadSimulation()">Analisar Base</button>
+                                <button class="btn btn-primary btn-sm" onclick="processUploadSimulation()">Analisar e Consolidar</button>
                                 <button class="btn btn-outline btn-sm" onclick="cancelUploadSimulation()">Cancelar</button>
                                 <button class="btn btn-outline btn-sm" onclick="openModalErrors()">Visualizar Erros</button>
                             </div>
                         </div>
                         <div id="upload-results-summary" style="display:none; margin-top:20px; padding:12px; background-color:var(--fundo-principal); border-radius:6px;">
                             <div style="display:grid; grid-template-columns:repeat(5, 1fr); gap:10px; text-align:center;">
-                                <div><div style="font-size:11px; color:var(--texto-secundario);">Linhas Totais</div><div style="font-weight:700; font-size:15px;">15.000</div></div>
-                                <div><div style="font-size:11px; color:var(--texto-secundario);">CNPJs Válidos</div><div style="font-weight:700; font-size:15px; color:var(--sucesso);">14.820</div></div>
-                                <div><div style="font-size:11px; color:var(--texto-secundario);">Duplicidades</div><div style="font-weight:700; font-size:15px; color:var(--alerta);">120</div></div>
-                                <div><div style="font-size:11px; color:var(--texto-secundario);">Registros Novos</div><div style="font-weight:700; font-size:15px; color:var(--azul-principal);">11.400</div></div>
-                                <div><div style="font-size:11px; color:var(--texto-secundario);">Atualizados</div><div style="font-weight:700; font-size:15px; color:var(--laranja-principal);">3.420</div></div>
+                                <div><div style="font-size:11px; color:var(--texto-secundario);">Linhas Totais</div><div style="font-weight:700; font-size:15px;">1.500.000</div></div>
+                                <div><div style="font-size:11px; color:var(--texto-secundario);">CNPJs Válidos</div><div style="font-weight:700; font-size:15px; color:var(--sucesso);">1.482.910</div></div>
+                                <div><div style="font-size:11px; color:var(--texto-secundario);">Duplicidades</div><div style="font-weight:700; font-size:15px; color:var(--alerta);">12.500</div></div>
+                                <div><div style="font-size:11px; color:var(--texto-secundario);">Registros Novos</div><div style="font-weight:700; font-size:15px; color:var(--azul-principal);">1.140.000</div></div>
+                                <div><div style="font-size:11px; color:var(--texto-secundario);">Atualizados</div><div style="font-weight:700; font-size:15px; color:var(--laranja-principal);">342.910</div></div>
                             </div>
                         </div>
                     </div>
@@ -370,11 +370,11 @@
                 <!-- 2. DASHBOARD -->
                 <div id="tab-dashboard" class="tab-content">
                     <div style="margin-bottom:20px;">
-                        <h1 style="font-size:20px; font-weight:700; color:var(--azul-principal);">Dashboard Principal</h1>
-                        <p style="color:var(--texto-secundario); font-size:13px;">Visão consolidada do universo empresarial monitorado no Brasil.</p>
+                        <h1 style="font-size:20px; font-weight:700; color:var(--azul-principal);">Dashboard Principal (Nacional)</h1>
+                        <p style="color:var(--texto-secundario); font-size:13px;">Visão consolidada do universo empresarial monitorado em todo o Brasil.</p>
                     </div>
                     <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap:16px; margin-bottom:24px;">
-                        <div class="card" style="margin-bottom:0; border-left:4px solid var(--azul-principal);"><div style="font-size:11px; font-weight:700; color:var(--texto-secundario); margin-bottom:6px;">TOTAL DE EMPRESAS</div><div style="font-size:24px; font-weight:800;" id="kpi-empresas">1.482.910</div></div>
+                        <div class="card" style="margin-bottom:0; border-left:4px solid var(--azul-principal);"><div style="font-size:11px; font-weight:700; color:var(--texto-secundario); margin-bottom:6px;">TOTAL DE EMPRESAS (BRASIL)</div><div style="font-size:24px; font-weight:800;" id="kpi-empresas">1.482.910</div></div>
                         <div class="card" style="margin-bottom:0; border-left:4px solid var(--azul-principal);"><div style="font-size:11px; font-weight:700; color:var(--texto-secundario); margin-bottom:6px;">DECISORES MAPEADOS</div><div style="font-size:24px; font-weight:800;" id="kpi-decisores">418.520</div></div>
                         <div class="card" style="margin-bottom:0; border-left:4px solid var(--laranja-principal);"><div style="font-size:11px; font-weight:700; color:var(--texto-secundario); margin-bottom:6px;">SINAIS NO RADAR</div><div style="font-size:24px; font-weight:800;" id="kpi-sinais">3.890</div></div>
                         <div class="card" style="margin-bottom:0; border-left:4px solid var(--laranja-principal);"><div style="font-size:11px; font-weight:700; color:var(--texto-secundario); margin-bottom:6px;">LEADS BDR (FIT > 75)</div><div style="font-size:24px; font-weight:800;" id="kpi-leads">1.240</div></div>
@@ -385,12 +385,12 @@
                 <div id="tab-busca" class="tab-content">
                     <div style="margin-bottom:20px;">
                         <h1 style="font-size:20px; font-weight:700; color:var(--azul-principal);">Busca Empresarial Avançada</h1>
-                        <p style="color:var(--texto-secundario); font-size:13px;">Filtre por parâmetros estruturados ou utilize pesquisa em Linguagem Natural com IA.</p>
+                        <p style="color:var(--texto-secundario); font-size:13px;">Filtre por parâmetros estruturados em nível nacional ou utilize pesquisa em Linguagem Natural com IA.</p>
                     </div>
                     <div class="card">
                         <div class="card-header"><h2 class="card-title">Pesquisa por Linguagem Natural</h2></div>
                         <div style="display:flex; gap:10px; margin-bottom:12px;">
-                            <input type="text" class="form-control" id="nl-query-input" placeholder="Ex: Indústrias de alimentos no Rio Grande do Sul com expansão recente...">
+                            <input type="text" class="form-control" id="nl-query-input" placeholder="Ex: Grandes indústrias de alimentos em SP, RS e SC com expansão recente...">
                             <button class="btn btn-primary" onclick="interpretNLQuery()">Interpretar por IA</button>
                         </div>
                         <div id="nl-interpretation-box" style="display:none; padding:12px; background-color:var(--azul-suave); border-radius:6px; font-size:12px;">
@@ -398,7 +398,7 @@
                         </div>
                     </div>
                     <div class="card">
-                        <div class="card-header"><h2 class="card-title">Empresas Encontradas</h2></div>
+                        <div class="card-header"><h2 class="card-title">Empresas Encontradas (Banco Nacional)</h2></div>
                         <div class="table-container">
                             <table>
                                 <thead><tr><th>CNPJ</th><th>Razão Social / Fantasia</th><th>UF / Cidade</th><th>Setor</th><th>Score Fit</th><th>Ações</th></tr></thead>
@@ -431,7 +431,7 @@
                             <p><strong>Funcionários:</strong> 1.200 colaboradores</p>
                         </div>
                         <div class="card">
-                            <div class="card-header"><h3 class="card-title">Decisor Mapeado (Supply Chain)</h3></div>
+                            <div class="card-header"><h3 class="card-title">Decisor Mapeado (Supply Chain / Logística)</h3></div>
                             <p><strong>Carlos Eduardo Mendes</strong><br><span style="font-size:12px; color:var(--texto-secundario);">Gerente de Supply Chain</span><br>📧 carlos.mendes@soprano.com.br<br>💬 (54) 2109-6000</p>
                         </div>
                     </div>
@@ -440,8 +440,8 @@
                 <!-- 5. RADAR DE MERCADO -->
                 <div id="tab-radar" class="tab-content">
                     <div style="margin-bottom:20px;">
-                        <h1 style="font-size:20px; font-weight:700; color:var(--azul-principal);">Radar de Mercado</h1>
-                        <p style="color:var(--texto-secundario); font-size:13px;">Monitoramento contínuo de anúncios de investimentos, novas fábricas e CDs.</p>
+                        <h1 style="font-size:20px; font-weight:700; color:var(--azul-principal);">Radar de Mercado (Nacional)</h1>
+                        <p style="color:var(--texto-secundario); font-size:13px;">Monitoramento contínuo de anúncios de investimentos, novas fábricas e CDs em todo o país.</p>
                     </div>
                     <div class="card">
                         <div class="table-container">
@@ -488,7 +488,7 @@
                 <div id="tab-bdr" class="tab-content">
                     <div style="margin-bottom:20px;">
                         <h1 style="font-size:20px; font-weight:700; color:var(--azul-principal);">Listas para BDRs (Distribuição Comercial)</h1>
-                        <p style="color:var(--texto-secundario); font-size:13px;">Leads qualificados prontos para prospecção consultiva direta.</p>
+                        <p style="color:var(--texto-secundario); font-size:13px;">Leads qualificados prontos para prospecção consultiva direta com decisores de Supply Chain e Compras.</p>
                     </div>
                     <div class="card">
                         <div class="card-header">
@@ -515,9 +515,9 @@
                             <table>
                                 <thead><tr><th>Nome da Fonte</th><th>Categoria</th><th>Periodicidade</th><th>Status</th></tr></thead>
                                 <tbody>
-                                    <tr><td>Receita Federal (CNPJ)</td><td>Pública Cadastral</td><td>Mensal</td><td><span class="badge badge-success">Ativa</span></td></tr>
-                                    <tr><td>Jornais Regionais (RS/SC/PR)</td><td>Notícias</td><td>Horária</td><td><span class="badge badge-success">Ativa</span></td></tr>
-                                    <tr><td>Diários Oficiais</td><td>Regulatória</td><td>Diária</td><td><span class="badge badge-warning">Simulada</span></td></tr>
+                                    <tr><td>Receita Federal (Nacional)</td><td>Pública Cadastral</td><td>Mensal</td><td><span class="badge badge-success">Ativa</span></td></tr>
+                                    <tr><td>Jornais Regionais e Nacionais</td><td>Notícias</td><td>Horária</td><td><span class="badge badge-success">Ativa</span></td></tr>
+                                    <tr><td>Diários Oficiais Estaduais</td><td>Regulatória</td><td>Diária</td><td><span class="badge badge-warning">Simulada</span></td></tr>
                                 </tbody>
                             </table>
                         </div>
@@ -532,7 +532,7 @@
                     </div>
                     <div class="card">
                         <h2 class="card-title" style="margin-bottom:12px;">Parâmetros de Segurança</h2>
-                        <p><strong>Minimização de Dados:</strong> Coleta exclusiva de telefones e e-mails corporativos institucionais.</p>
+                        <p><strong>Minimização de Dados:</strong> Coleta exclusiva de telefones e e-mails corporativos institucionais de decisores.</p>
                         <p style="margin-top:8px;"><strong>Quarentena de Prospecção:</strong> Bloqueio automático de abordagem por 90 dias após o descarte.</p>
                     </div>
                 </div>
@@ -570,18 +570,19 @@
     <script>
         const MOCK_DATA = {
             basesImportadas: [
-                { nome: 'base_receita_federal_sul_2026.csv', origem: 'Receita Federal', data: '06/11/2026 08:30', linhas: '1.200.000', validos: '1.185.000', duplicados: '15.000', status: 'Consolidado' },
-                { nome: 'enriquecimento_decisores_supply.xlsx', origem: 'Base Licenciada', data: '05/11/2026 14:15', linhas: '50.000', validos: '49.800', duplicados: '200', status: 'Consolidado' }
+                { nome: 'base_nacional_receita_2026.zip', origem: 'Receita Federal', data: '06/11/2026 08:30', linhas: '1.500.000', validos: '1.482.910', duplicados: '12.500', status: 'Consolidado' },
+                { nome: 'enriquecimento_decisores_nacional.xlsx', origem: 'Base Licenciada', data: '05/11/2026 14:15', linhas: '450.000', validos: '448.500', duplicados: '1.500', status: 'Consolidado' }
             ],
             empresas: [
                 { cnpj: '88.542.120/0001-90', nome: 'Soprano MatCon S.A.', uf: 'RS', cidade: 'Caxias do Sul', setor: 'Metalmecânica', score: 96, decisor: 'Carlos Eduardo Mendes', cargo: 'Gerente de Supply Chain', email: 'carlos.mendes@soprano.com.br', tel: '(54) 2109-6000', solucao: 'Porta-Paletes & Shuttle', status: 'Aprovado' },
                 { cnpj: '07.321.450/0002-12', nome: 'Delly\'s / Fritz & Frida', uf: 'RS', cidade: 'Ivoti', setor: 'Alimentos', score: 94, decisor: 'Roberto Sampaio', cargo: 'Diretor de Logística', email: 'roberto.sampaio@dellys.com.br', tel: '(51) 3563-9000', solucao: 'Porta-Paletes Alta Densidade', status: 'Novo' },
                 { cnpj: '79.379.491/0008-05', nome: 'Havan Logística', uf: 'SC', cidade: 'Barra Velha', setor: 'Varejo', score: 92, decisor: 'Luciano Hang Jr.', cargo: 'Head de Logística', email: 'logistica@havan.com.br', tel: '(47) 3255-5000', solucao: 'Transelevadores & Automação', status: 'Em Validação' },
-                { cnpj: '05.123.789/0001-44', nome: 'Maxinutri Indústria', uf: 'PR', cidade: 'Arapongas', setor: 'Farmacêutico', score: 88, decisor: 'Marcos Vinicius', cargo: 'Gerente de Suprimentos', email: 'suprimentos@maxinutri.com.br', tel: '(43) 3275-8000', solucao: 'Porta-Paletes Convencional', status: 'Novo' }
+                { cnpj: '05.123.789/0001-44', nome: 'Maxinutri Indústria', uf: 'PR', cidade: 'Arapongas', setor: 'Farmacêutico', score: 88, decisor: 'Marcos Vinicius', cargo: 'Gerente de Suprimentos', email: 'suprimentos@maxinutri.com.br', tel: '(43) 3275-8000', solucao: 'Porta-Paletes Convencional', status: 'Novo' },
+                { cnpj: '61.548.230/0001-10', nome: 'Magalu Centros de Distribuição', uf: 'SP', cidade: 'Guarulhos', setor: 'E-commerce / Varejo', score: 95, decisor: 'Fernanda Lima', cargo: 'Diretora de Compras & Suprimentos', email: 'fernanda.lima@magazineluiza.com.br', tel: '(11) 3508-9900', solucao: 'Automação Intralogística & Shuttle', status: 'Aprovado' }
             ],
             sinais: [
                 { data: '06/11/2026', empresa: 'Soprano MatCon S.A.', cnpj: '88.542.120/0001-90', tipo: 'Novo Centro de Distribuição', confianca: 'Alta (100%)', fonte: 'Diário de Caxias / RI' },
-                { data: '05/11/2026', empresa: 'Delly\'s Fritz & Frida', cnpj: '07.321.450/0002-12', tipo: 'Ampliação de Fábrica (10 mil m²)', confianca: 'Alta (95%)', fonte: 'Notícias Industriais RS' }
+                { data: '05/11/2026', empresa: 'Magalu Centros de Distribuição', cnpj: '61.548.230/0001-10', tipo: 'Ampliação de CD (50 mil m²)', confianca: 'Alta (98%)', fonte: 'Notícias de Logística SP' }
             ]
         };
 
@@ -604,6 +605,7 @@
 
         function renderHistoricoBases() {
             const tbody = document.getElementById('tbody-historico-bases');
+            if(!tbody) return;
             tbody.innerHTML = MOCK_DATA.basesImportadas.map(b => `
                 <tr>
                     <td><strong>${b.nome}</strong></td>
@@ -684,7 +686,8 @@
                 e.nome.toLowerCase().includes(lower) || 
                 e.cnpj.includes(lower) || 
                 e.decisor.toLowerCase().includes(lower) ||
-                e.setor.toLowerCase().includes(lower)
+                e.setor.toLowerCase().includes(lower) ||
+                e.uf.toLowerCase().includes(lower)
             );
             renderBuscaEmpresas(filtrados);
         }
@@ -724,7 +727,7 @@
                 if(progress >= 100) {
                     clearInterval(interval);
                     document.getElementById('upload-results-summary').style.display = 'block';
-                    alert('Simulação de ingestão e deduplicação concluída com sucesso!');
+                    alert('Simulação de ingestão e deduplicação nacional concluída com sucesso!');
                 }
             }, 250);
         }
@@ -742,9 +745,9 @@
             if(!query) { alert('Digite uma consulta.'); return; }
             document.getElementById('nl-interpretation-box').style.display = 'block';
             document.getElementById('nl-parsed-tags').innerHTML = `
-                <span class="badge badge-info">Setor: Alimentos</span>
-                <span class="badge badge-info">UF: RS</span>
-                <span class="badge badge-warning">Sinal: Expansão de CD</span>
+                <span class="badge badge-info">Abrangência: Nacional (SP, RS, SC, PR)</span>
+                <span class="badge badge-info">Setor: Alimentos & Varejo</span>
+                <span class="badge badge-warning">Sinal: Expansão de CDs e Fábricas</span>
             `;
         }
 
