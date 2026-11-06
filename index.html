@@ -286,7 +286,7 @@
                 <li class="nav-item"><a class="nav-link" onclick="switchTab('tab-config')">🔒 Configurações & Governança</a></li>
             </ul>
             <div style="padding:14px 16px; border-top:1px solid rgba(255,255,255,0.1); font-size:11px; color:#94A3B8; background-color:var(--azul-escuro);">
-                PAIM.IA.PROSPECT v2.1 REAL<br>Motor Adaptativo Anexo 02
+                PAIM.IA.PROSPECT v2.2 STREAMING<br>Motor Adaptativo Anexo 02
             </div>
         </aside>
 
@@ -972,6 +972,171 @@
             });
         }
 
+        const LIMITE_IMPORTACAO_MEMORIA = 25 * 1024 * 1024;
+        const DB_NOME_PROSPECT = 'PAIM_IA_PROSPECT_DB';
+        const DB_VERSAO_PROSPECT = 1;
+
+        function abrirBancoProspect() {
+            return new Promise((resolve, reject) => {
+                const req = indexedDB.open(DB_NOME_PROSPECT, DB_VERSAO_PROSPECT);
+                req.onupgradeneeded = event => {
+                    const db = event.target.result;
+                    if (!db.objectStoreNames.contains('empresas')) {
+                        const store = db.createObjectStore('empresas', { keyPath: 'chave' });
+                        store.createIndex('cnpj', 'cnpjDigitos', { unique: false });
+                        store.createIndex('uf', 'uf', { unique: false });
+                    }
+                    if (!db.objectStoreNames.contains('importacoes')) {
+                        db.createObjectStore('importacoes', { keyPath: 'id', autoIncrement: true });
+                    }
+                };
+                req.onsuccess = () => resolve(req.result);
+                req.onerror = () => reject(req.error || new Error('Falha ao abrir o banco local.'));
+            });
+        }
+
+        function salvarLoteIndexedDB(db, registros) {
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction('empresas', 'readwrite');
+                const store = tx.objectStore('empresas');
+                registros.forEach(registro => store.put(registro));
+                tx.oncomplete = () => resolve();
+                tx.onerror = () => reject(tx.error || new Error('Falha ao gravar lote no banco local.'));
+                tx.onabort = () => reject(tx.error || new Error('Gravacao do lote cancelada.'));
+            });
+        }
+
+        function contarRegistrosIndexedDB(db) {
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction('empresas', 'readonly');
+                const req = tx.objectStore('empresas').count();
+                req.onsuccess = () => resolve(req.result || 0);
+                req.onerror = () => reject(req.error);
+            });
+        }
+
+        async function importarCSVGrandeEmStreaming(arquivo) {
+            const db = await abrirBancoProspect();
+            const barra = document.getElementById('upload-progress-bar');
+            const status = document.getElementById('upload-percentage');
+            let cabecalhos = null;
+            let layout = 'flexivel';
+            let totalLinhas = 0;
+            let validos = 0;
+            let invalidos = 0;
+            let semChave = 0;
+            let processadosBytes = 0;
+            const amostraTela = [];
+
+            await new Promise((resolve, reject) => {
+                Papa.parse(arquivo, {
+                    header: false,
+                    skipEmptyLines: 'greedy',
+                    dynamicTyping: false,
+                    worker: true,
+                    chunkSize: 5 * 1024 * 1024,
+                    chunk: function(results, parser) {
+                        parser.pause();
+                        (async () => {
+                            try {
+                                let matriz = (results.data || []).filter(l => Array.isArray(l) && l.some(valorPreenchido));
+                                if (!matriz.length) { parser.resume(); return; }
+
+                                let registrosObjetos = [];
+                                if (!cabecalhos) {
+                                    const convertido = matrizParaObjetos(matriz);
+                                    cabecalhos = convertido.cabecalhos;
+                                    layout = detectarLayoutReceita(cabecalhos, convertido.registros);
+                                    registrosObjetos = convertido.registros;
+                                } else {
+                                    registrosObjetos = matriz.map(linha => {
+                                        const obj = {};
+                                        cabecalhos.forEach((h, i) => obj[h] = linha[i] == null ? '' : linha[i]);
+                                        return obj;
+                                    });
+                                }
+
+                                const lote = [];
+                                registrosObjetos.forEach(row => {
+                                    totalLinhas++;
+                                    const r = extrairRegistroCanonico(row, layout);
+                                    const chave = r.cnpjDigitos || (r.cnpjBasico ? `BASE:${r.cnpjBasico}` : '');
+                                    if (!chave) { semChave++; return; }
+                                    if (r.cnpjDigitos && r.cnpjValido) validos++;
+                                    else if (r.cnpjDigitos) invalidos++;
+                                    const item = {
+                                        chave,
+                                        cnpj: r.cnpj,
+                                        cnpjDigitos: r.cnpjDigitos,
+                                        cnpjBasico: r.cnpjBasico,
+                                        cnpjValido: r.cnpjValido,
+                                        nome: r.nome || 'Razao social nao disponivel nesta base',
+                                        razao: r.razao,
+                                        fantasia: r.fantasia,
+                                        uf: r.uf,
+                                        cidade: r.cidade,
+                                        municipioCodigo: r.municipioCodigo,
+                                        cnae: r.cnae,
+                                        setor: r.setor || 'Nao informado',
+                                        email: r.email,
+                                        tel: r.tel,
+                                        matrizFilial: r.matrizFilial,
+                                        situacao: r.situacao,
+                                        porte: r.porte,
+                                        capital: r.capital,
+                                        cep: r.cep,
+                                        dataAbertura: r.dataAbertura,
+                                        score: 0,
+                                        status: r.cnpjValido ? 'Importado' : 'Requer validacao',
+                                        origemImportacao: arquivo.name
+                                    };
+                                    lote.push(item);
+                                    if (amostraTela.length < 300) amostraTela.push(item);
+                                });
+
+                                if (lote.length) await salvarLoteIndexedDB(db, lote);
+                                processadosBytes = Math.min(arquivo.size, processadosBytes + 5 * 1024 * 1024);
+                                const pct = Math.max(2, Math.min(98, Math.round((processadosBytes / arquivo.size) * 100)));
+                                barra.style.width = pct + '%';
+                                status.innerText = `Processando em streaming: ${totalLinhas.toLocaleString('pt-BR')} linhas (${pct}%)`;
+                                await new Promise(r => setTimeout(r, 0));
+                                parser.resume();
+                            } catch (erro) {
+                                parser.abort();
+                                reject(erro);
+                            }
+                        })();
+                    },
+                    complete: () => resolve(),
+                    error: erro => reject(erro)
+                });
+            });
+
+            const totalBanco = await contarRegistrosIndexedDB(db);
+            BASE_GLOBAL.empresas = amostraTela;
+            BASE_GLOBAL.historico.unshift({
+                nome: arquivo.name,
+                origem: `CSV em streaming | IndexedDB | ${layout}`,
+                data: new Date().toLocaleString('pt-BR'),
+                linhas: totalLinhas.toLocaleString('pt-BR'),
+                validos: validos.toLocaleString('pt-BR'),
+                duplicados: 'Consolidados pela chave',
+                status: 'Consolidado localmente'
+            });
+
+            document.getElementById('res-totais').innerText = totalLinhas.toLocaleString('pt-BR');
+            document.getElementById('res-validos').innerText = validos.toLocaleString('pt-BR');
+            document.getElementById('res-duplicados').innerText = 'Por chave';
+            document.getElementById('res-novos').innerText = totalBanco.toLocaleString('pt-BR');
+            document.getElementById('res-atualizados').innerText = 'IndexedDB';
+            document.getElementById('upload-results-summary').style.display = 'block';
+            document.getElementById('status-base-header').innerText = `Base local: ${totalBanco.toLocaleString('pt-BR')} registros | tela exibe amostra de 300`;
+            barra.style.width = '100%';
+            status.innerText = 'Importacao em streaming concluida';
+            atualizarTudoNaTela();
+            alert(`Importacao concluida sem carregar todo o arquivo na memoria.\n\nLinhas lidas: ${totalLinhas.toLocaleString('pt-BR')}\nCNPJs validos: ${validos.toLocaleString('pt-BR')}\nCNPJs invalidos: ${invalidos.toLocaleString('pt-BR')}\nSem chave: ${semChave.toLocaleString('pt-BR')}\nRegistros consolidados no banco local: ${totalBanco.toLocaleString('pt-BR')}\n\nA tela mostra somente uma amostra de ate 300 registros para evitar travamento.`);
+        }
+
         async function processUploadedFile() {
             if (!ARQUIVO_PENDENTE) {
                 alert('Nenhum arquivo selecionado.');
@@ -986,6 +1151,17 @@
             barra.style.width = '25%';
 
             try {
+                if ((fileName.endsWith('.csv') || fileName.endsWith('.txt')) && arquivo.size > LIMITE_IMPORTACAO_MEMORIA) {
+                    status.innerText = 'Arquivo grande detectado. Iniciando leitura em streaming...';
+                    barra.style.width = '2%';
+                    await importarCSVGrandeEmStreaming(arquivo);
+                    return;
+                }
+
+                if ((fileName.endsWith('.xlsx') || fileName.endsWith('.xls')) && arquivo.size > 100 * 1024 * 1024) {
+                    throw new Error('Este Excel ultrapassa 100 MB. Converta a aba para CSV e importe o CSV. Arquivos Excel grandes precisam ser descompactados integralmente na memoria do navegador.');
+                }
+
                 let matriz = [];
                 let detalheOrigem = '';
 
