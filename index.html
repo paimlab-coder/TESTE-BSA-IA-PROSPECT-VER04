@@ -7,7 +7,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <!-- Bibliotecas para leitura real de CSV e XLSX no navegador -->
+    <!-- Bibliotecas para leitura universal de arquivos CSV, TXT e XLSX no navegador -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
@@ -287,16 +287,16 @@
                 <li class="nav-item"><a class="nav-link" onclick="switchTab('tab-config')">🔒 Configurações & Governança</a></li>
             </ul>
             <div style="padding:14px 16px; border-top:1px solid rgba(255,255,255,0.1); font-size:11px; color:#94A3B8; background-color:var(--azul-escuro);">
-                PAIM.IA.PROSPECT v1.4 REAL<br>Banco Inteligente Ativo
+                PAIM.IA.PROSPECT v1.5 CORRIGIDO<br>Leitor Inteligente de Planilhas
             </div>
         </aside>
 
-        <!-- WRAPPER -->
+        <!-- WRAPPER DE CONTEÚDO -->
         <div class="main-wrapper">
             <header>
                 <div style="display:flex; align-items:center; gap:8px; background-color:var(--azul-suave); color:var(--azul-principal); padding:6px 12px; border-radius:20px; font-size:12px; font-weight:600;">
                     <span style="width:8px; height:8px; background-color:var(--sucesso); border-radius:50%; display:inline-block;"></span>
-                    <span id="status-base-header">Base Nacional Dinâmica Ativa</span>
+                    <span id="status-base-header">Base Pronta para Carga</span>
                 </div>
                 <div style="position:relative; width:380px;">
                     <span style="position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--texto-secundario);">🔍</span>
@@ -316,22 +316,22 @@
                 <!-- 1. CENTRAL DE BASES -->
                 <div id="tab-central-bases" class="tab-content active">
                     <div style="margin-bottom:20px;">
-                        <h1 style="font-size:20px; font-weight:700; color:var(--azul-principal);">Central de Bases (Ingestão de XLSX e CSV)</h1>
-                        <p style="color:var(--texto-secundario); font-size:13px;">Suba sua planilha real para popular automaticamente o Dashboard, Busca e Fila BDR.</p>
+                        <h1 style="font-size:20px; font-weight:700; color:var(--azul-principal);">Central de Bases (Leitura de Planilhas)</h1>
+                        <p style="color:var(--texto-secundario); font-size:13px;">Selecione seu arquivo .CSV ou .XLSX. O leitor irá identificar automaticamente a tabela de dados.</p>
                     </div>
 
                     <div style="background-color:var(--sucesso-fundo); border-left:4px solid var(--sucesso); padding:12px 16px; border-radius:8px; margin-bottom:20px; display:flex; justify-content:space-between; color:#14532D; font-size:13px;">
-                        <span>✅ <strong>Leitor Real Ativo.</strong> Suporta arquivos `.xlsx`, `.xls` e `.csv`. Ao clicar em "Analisar e Consolidar", os números do Dashboard mudarão imediatamente.</span>
-                        <span class="badge badge-success">Pronto para Uso</span>
+                        <span>✅ <strong>Leitor com Varredura Automática de Cabeçalho.</strong> Funciona mesmo se a planilha tiver linhas vazias no topo.</span>
+                        <span class="badge badge-success">Pronto para Ingestão</span>
                     </div>
 
                     <div class="card">
                         <div class="card-header"><h2 class="card-title">Novo Upload de Base Empresarial</h2></div>
                         <div style="border:2px dashed var(--azul-principal); background-color:var(--azul-suave); border-radius:8px; padding:30px; text-align:center; cursor:pointer;" onclick="document.getElementById('file-input').click()">
                             <div style="font-size:36px; margin-bottom:10px;">📊</div>
-                            <h3 style="font-size:14px; font-weight:700; color:var(--azul-principal);">Clique para selecionar ou arraste sua planilha .XLSX / .CSV aqui</h3>
-                            <p style="font-size:12px; color:var(--texto-secundario); margin-top:4px;">O sistema processará as linhas e atualizará o tabelão corporativo instantaneamente</p>
-                            <input type="file" id="file-input" accept=".csv, .xlsx, .xls" style="display:none;" onchange="handleFileSelect(event)">
+                            <h3 style="font-size:14px; font-weight:700; color:var(--azul-principal);">Clique para selecionar sua planilha .XLSX, .XLS ou .CSV aqui</h3>
+                            <p style="font-size:12px; color:var(--texto-secundario); margin-top:4px;">Atualização dinâmica do Dashboard e das Fias de Trabalho BDR</p>
+                            <input type="file" id="file-input" accept=".csv, .xlsx, .xls, .txt" style="display:none;" onchange="handleFileSelect(event)">
                         </div>
                         <div id="upload-progress-section" style="display:none; margin-top:20px;">
                             <div style="display:flex; justify-content:space-between; font-size:12px; font-weight:600;">
@@ -348,7 +348,7 @@
                         </div>
                         <div id="upload-results-summary" style="display:none; margin-top:20px; padding:12px; background-color:var(--fundo-principal); border-radius:6px;">
                             <div style="display:grid; grid-template-columns:repeat(5, 1fr); gap:10px; text-align:center;">
-                                <div><div style="font-size:11px; color:var(--texto-secundario);">Linhas Totais</div><div style="font-weight:700; font-size:15px;" id="res-totais">0</div></div>
+                                <div><div style="font-size:11px; color:var(--texto-secundario);">Linhas Lidas</div><div style="font-weight:700; font-size:15px;" id="res-totais">0</div></div>
                                 <div><div style="font-size:11px; color:var(--texto-secundario);">CNPJs Válidos</div><div style="font-weight:700; font-size:15px; color:var(--sucesso);" id="res-validos">0</div></div>
                                 <div><div style="font-size:11px; color:var(--texto-secundario);">Duplicidades</div><div style="font-weight:700; font-size:15px; color:var(--alerta);" id="res-duplicados">0</div></div>
                                 <div><div style="font-size:11px; color:var(--texto-secundario);">Registros Novos</div><div style="font-weight:700; font-size:15px; color:var(--azul-principal);" id="res-novos">0</div></div>
@@ -371,8 +371,8 @@
                 <!-- 2. DASHBOARD -->
                 <div id="tab-dashboard" class="tab-content">
                     <div style="margin-bottom:20px;">
-                        <h1 style="font-size:20px; font-weight:700; color:var(--azul-principal);">Dashboard Principal (Atualizado pela Base)</h1>
-                        <p style="color:var(--texto-secundario); font-size:13px;">Visão consolidada refletindo exatamente os dados carregados na Central de Bases.</p>
+                        <h1 style="font-size:20px; font-weight:700; color:var(--azul-principal);">Dashboard Principal</h1>
+                        <p style="color:var(--texto-secundario); font-size:13px;">Indicadores consolidados atualizados em tempo real pela sua planilha.</p>
                     </div>
                     <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap:16px; margin-bottom:24px;">
                         <div class="card" style="margin-bottom:0; border-left:4px solid var(--azul-principal);"><div style="font-size:11px; font-weight:700; color:var(--texto-secundario); margin-bottom:6px;">TOTAL DE EMPRESAS</div><div style="font-size:24px; font-weight:800;" id="kpi-empresas">0</div></div>
@@ -386,10 +386,10 @@
                 <div id="tab-busca" class="tab-content">
                     <div style="margin-bottom:20px;">
                         <h1 style="font-size:20px; font-weight:700; color:var(--azul-principal);">Busca Empresarial Avançada</h1>
-                        <p style="color:var(--texto-secundario); font-size:13px;">Consulte instantaneamente todas as empresas da base importada.</p>
+                        <p style="color:var(--texto-secundario); font-size:13px;">Tabelão completo dos registros lidos do seu arquivo.</p>
                     </div>
                     <div class="card">
-                        <div class="card-header"><h2 class="card-title">Tabelão de Empresas Encontradas</h2></div>
+                        <div class="card-header"><h2 class="card-title">Empresas Encontradas</h2></div>
                         <div class="table-container">
                             <table>
                                 <thead><tr><th>CNPJ</th><th>Razão Social / Fantasia</th><th>UF / Cidade</th><th>Setor</th><th>Score Fit</th><th>Ações</th></tr></thead>
@@ -403,7 +403,7 @@
                 <div id="tab-empresa-360" class="tab-content">
                     <div style="margin-bottom:20px;">
                         <h1 style="font-size:20px; font-weight:700; color:var(--azul-principal);">Ficha Empresa 360°</h1>
-                        <p style="color:var(--texto-secundario); font-size:13px;">Detalhes cadastrais e de inteligência da conta selecionada.</p>
+                        <p style="color:var(--texto-secundario); font-size:13px;">Visão 360° da conta selecionada.</p>
                     </div>
                     <div class="card">
                         <div style="display:flex; justify-content:space-between; align-items:flex-start;">
@@ -432,7 +432,6 @@
                 <!-- 6. ICP & SCORE -->
                 <div id="tab-icp-score" class="tab-content">
                     <div style="margin-bottom:20px;"><h1 style="font-size:20px; font-weight:700; color:var(--azul-principal);">ICP & Configuração de Pesos</h1></div>
-                    <div class="card"><p>Ajuste de ponderação do score composto da base.</p></div>
                 </div>
 
                 <!-- 7. FILA DE OPORTUNIDADES -->
@@ -452,7 +451,7 @@
                 <div id="tab-bdr" class="tab-content">
                     <div style="margin-bottom:20px;">
                         <h1 style="font-size:20px; font-weight:700; color:var(--azul-principal);">Listas para BDRs (Contatos Diretos)</h1>
-                        <p style="color:var(--texto-secundario); font-size:13px;">Abordagem comercial gerada da sua base.</p>
+                        <p style="color:var(--texto-secundario); font-size:13px;">Contatos e acionamentos diretos de WhatsApp gerados da sua planilha.</p>
                     </div>
                     <div class="card">
                         <div class="table-container">
@@ -488,10 +487,10 @@
     </div>
 
     <script>
-        // ESTADO GLOBAL DO SISTEMA (INICIA COM DADOS DEMONSTRATIVOS)
+        // BASE GLOBAL INICIAL
         let BASE_GLOBAL = {
             historico: [
-                { nome: 'base_nacional_receita_2026.zip', origem: 'Receita Federal', data: '06/11/2026 08:30', linhas: '1.500.000', validos: '1.482.910', duplicados: '12.500', status: 'Consolidado' }
+                { nome: 'amostra_demonstrativa.xlsx', origem: 'Base Inicial', data: '06/11/2026 08:30', linhas: '3', validos: '3', duplicados: '0', status: 'Consolidado' }
             ],
             empresas: [
                 { cnpj: '88.542.120/0001-90', nome: 'Soprano MatCon S.A.', uf: 'RS', cidade: 'Caxias do Sul', setor: 'Metalmecânica', score: 96, decisor: 'Carlos Eduardo Mendes', cargo: 'Gerente de Supply Chain', email: 'carlos.mendes@soprano.com.br', tel: '(54) 2109-6000', solucao: 'Porta-Paletes & Shuttle', status: 'Aprovado' },
@@ -500,8 +499,7 @@
             ],
             sinais: [
                 { data: '06/11/2026', empresa: 'Soprano MatCon S.A.', cnpj: '88.542.120/0001-90', tipo: 'Novo Centro de Distribuição', confianca: 'Alta (100%)', fonte: 'Diário de Caxias / RI' },
-                { data: '05/11/2026', empresa: 'Delly\'s Fritz & Frida', cnpj: '07.321.450/0002-12', tipo: 'Ampliação de Fábrica', confianca: 'Alta (95%)', fonte: 'Notícias RS' },
-                { data: '04/11/2026', empresa: 'Havan Logística', cnpj: '79.379.491/0008-05', tipo: 'Novo CD em SC', confianca: 'Alta (90%)', fonte: 'Portal Regional' }
+                { data: '05/11/2026', empresa: 'Delly\'s Fritz & Frida', cnpj: '07.321.450/0002-12', tipo: 'Ampliação de Fábrica', confianca: 'Alta (95%)', fonte: 'Notícias RS' }
             ]
         };
 
@@ -521,13 +519,11 @@
         };
 
         function atualizarTudoNaTela() {
-            // Atualiza Dashboard (KPIs)
             document.getElementById('kpi-empresas').innerText = BASE_GLOBAL.empresas.length.toLocaleString('pt-BR');
             document.getElementById('kpi-decisores').innerText = BASE_GLOBAL.empresas.filter(e => e.decisor).length.toLocaleString('pt-BR');
             document.getElementById('kpi-sinais').innerText = BASE_GLOBAL.sinais.length.toLocaleString('pt-BR');
             document.getElementById('kpi-leads').innerText = BASE_GLOBAL.empresas.filter(e => e.score >= 75).length.toLocaleString('pt-BR');
 
-            // Renderiza tabelas
             renderHistoricoBases();
             renderBuscaEmpresas(BASE_GLOBAL.empresas);
             renderRadarSinais();
@@ -591,7 +587,7 @@
                     <td><span class="badge badge-success">${e.score || 85}</span></td>
                     <td><span class="badge badge-warning">${e.solucao || 'Porta-Paletes'}</span></td>
                     <td><span class="badge badge-info">${e.status || 'Novo'}</span></td>
-                    <td><button class="btn btn-primary btn-sm" onclick="alert('Oportunidade Aprovada com Sucesso!')">Aprovar</button></td>
+                    <td><button class="btn btn-primary btn-sm" onclick="alert('Oportunidade Aprovada!')">Aprovar</button></td>
                 </tr>
             `).join('');
         }
@@ -611,7 +607,7 @@
         }
 
         /* --------------------------------------------------------------------------
-           MOTOR REAL DE LEITURA DE ARQUIVOS XLSX E CSV
+           MOTOR CORRIGIDO E INTELIGENTE DE LEITURA DE ARQUIVOS (.XLSX E .CSV)
            -------------------------------------------------------------------------- */
         function handleFileSelect(event) {
             ARQUIVO_PENDENTE = event.target.files[0];
@@ -633,10 +629,10 @@
 
             if (fileName.endsWith('.csv') || fileName.endsWith('.txt')) {
                 Papa.parse(ARQUIVO_PENDENTE, {
-                    header: true,
+                    header: false, // Lê como matriz para detectar o cabeçalho correto
                     skipEmptyLines: true,
                     complete: function(results) {
-                        converterEAtualizarBase(results.data, ARQUIVO_PENDENTE.name);
+                        processarMatrizBruta(results.data, ARQUIVO_PENDENTE.name);
                     },
                     error: function(err) {
                         alert('Erro ao ler arquivo CSV: ' + err.message);
@@ -650,8 +646,10 @@
                         const workbook = XLSX.read(data, {type: 'array'});
                         const firstSheetName = workbook.SheetNames[0];
                         const worksheet = workbook.Sheets[firstSheetName];
-                        const jsonDados = XLSX.utils.sheet_to_json(worksheet);
-                        converterEAtualizarBase(jsonDados, ARQUIVO_PENDENTE.name);
+                        
+                        // Converte para matriz de linhas puras
+                        const matrizBruta = XLSX.utils.sheet_to_json(worksheet, {header: 1});
+                        processarMatrizBruta(matrizBruta, ARQUIVO_PENDENTE.name);
                     } catch (error) {
                         alert('Erro ao ler arquivo Excel: ' + error.message);
                     }
@@ -662,64 +660,109 @@
             }
         }
 
-        function converterEAtualizarBase(dadosBrutos, nomeArquivo) {
-            if (!dadosBrutos || dadosBrutos.length === 0) {
-                alert('A planilha enviada está vazia ou não possui cabeçalhos válidos.');
+        // Função de inteligência que varre a planilha até achar a linha de cabeçalho
+        function processarMatrizBruta(linhas, nomeArquivo) {
+            if (!linhas || linhas.length === 0) {
+                alert('A planilha enviada está vazia.');
                 return;
             }
 
-            // Mapeia as linhas do Excel/CSV para a estrutura da plataforma
-            const novasEmpresas = dadosBrutos.map((row, index) => {
-                const keys = Object.keys(row);
-                const buscarCampo = (possiveisNomes) => {
-                    const k = keys.find(item => possiveisNomes.some(p => item.toLowerCase().includes(p.toLowerCase())));
-                    return k ? row[k] : '';
-                };
+            // Procurar a linha onde estão os cabeçalhos
+            let headerIndex = -1;
+            const possiveisColunas = ['cnpj', 'razao', 'empresa', 'nome', 'uf', 'cidade', 'setor', 'contato', 'telefone', 'cliente'];
 
-                return {
-                    cnpj: buscarCampo(['cnpj', 'documento', 'inscricao']) || `00.${index}12.345/0001-90`,
-                    nome: buscarCampo(['razao', 'nome', 'empresa', 'fantasia', 'cliente']) || row[keys[0]] || `Empresa ${index + 1}`,
-                    uf: buscarCampo(['uf', 'estado']) || 'RS',
-                    cidade: buscarCampo(['cidade', 'municipio', 'local']) || 'Caxias do Sul',
-                    setor: buscarCampo(['setor', 'cnae', 'segmento', 'ramo']) || 'Indústria / Logística',
+            for (let i = 0; i < Math.min(linhas.length, 20); i++) {
+                const linha = linhas[i];
+                if (Array.isArray(linha)) {
+                    const textoLinha = linha.join(' ').toLowerCase();
+                    if (possiveisColunas.some(p => textoLinha.includes(p))) {
+                        headerIndex = i;
+                        break;
+                    }
+                }
+            }
+
+            if (headerIndex === -1) {
+                // Se não achou palavras-chave específicas, assume que a primeira linha com dados é o cabeçalho
+                headerIndex = 0;
+            }
+
+            const headers = linhas[headerIndex].map(h => String(h || '').trim());
+            const dadosLinhas = linhas.slice(headerIndex + 1);
+
+            if (dadosLinhas.length === 0) {
+                alert('Não foram encontradas linhas de dados abaixo do cabeçalho.');
+                return;
+            }
+
+            // Função auxiliar de busca inteligente de campo nas colunas
+            const buscarValor = (linhaArr, palavrasChave) => {
+                const idx = headers.findIndex(h => palavrasChave.some(p => h.toLowerCase().includes(p.toLowerCase())));
+                return (idx !== -1 && linhaArr[idx] !== undefined) ? String(linhaArr[idx]).trim() : '';
+            };
+
+            const novasEmpresas = [];
+
+            dadosLinhas.forEach((row, index) => {
+                if (!row || row.length === 0 || row.every(val => val === null || val === '')) return; // ignora linhas vazias
+
+                const cnpj = buscarValor(row, ['cnpj', 'documento', 'inscricao']);
+                const nome = buscarValor(row, ['razao', 'empresa', 'nome', 'fantasia', 'cliente']) || `Empresa ${index + 1}`;
+                const uf = buscarValor(row, ['uf', 'estado']) || 'RS';
+                const cidade = buscarValor(row, ['cidade', 'municipio', 'local']) || 'Caxias do Sul';
+                const setor = buscarValor(row, ['setor', 'cnae', 'segmento', 'ramo']) || 'Indústria / Logística';
+                const decisor = buscarValor(row, ['decisor', 'contato', 'responsavel', 'comprador', 'diretor']) || 'Gerente de Supply Chain';
+                const cargo = buscarValor(row, ['cargo', 'funcao']) || 'Logística & Suprimentos';
+                const email = buscarValor(row, ['email', 'e-mail', 'mail']) || 'suprimentos@empresa.com.br';
+                const tel = buscarValor(row, ['telefone', 'tel', 'celular', 'fone', 'whatsapp']) || '(54) 2109-6000';
+
+                novasEmpresas.push({
+                    cnpj: cnpj || `00.${index}12.345/0001-90`,
+                    nome: nome,
+                    uf: uf,
+                    cidade: cidade,
+                    setor: setor,
                     score: Math.floor(Math.random() * 25) + 75,
-                    decisor: buscarCampo(['decisor', 'contato', 'responsavel', 'comprador', 'diretor']) || 'Gerente de Supply Chain',
-                    cargo: buscarCampo(['cargo', 'funcao']) || 'Logística & Suprimentos',
-                    email: buscarCampo(['email', 'e-mail', 'mail']) || 'suprimentos@empresa.com.br',
-                    tel: buscarCampo(['telefone', 'tel', 'celular', 'fone', 'whatsapp']) || '(54) 2109-6000',
+                    decisor: decisor,
+                    cargo: cargo,
+                    email: email,
+                    tel: tel,
                     solucao: 'Porta-Paletes & Sistema Shuttle',
                     status: 'Novo'
-                };
+                });
             });
 
-            // Atualiza o estado global
+            if (novasEmpresas.length === 0) {
+                alert('Não foi possível extrair dados válidos da planilha enviada.');
+                return;
+            }
+
+            // Atualizar Estado Global da Aplicação
             BASE_GLOBAL.empresas = novasEmpresas;
 
-            // Insere no histórico de importações
             BASE_GLOBAL.historico.unshift({
                 nome: nomeArquivo,
                 origem: 'Upload Local XLSX/CSV',
                 data: new Date().toLocaleString('pt-BR'),
-                linhas: dadosBrutos.length.toLocaleString('pt-BR'),
-                validos: dadosBrutos.length.toLocaleString('pt-BR'),
+                linhas: novasEmpresas.length.toLocaleString('pt-BR'),
+                validos: novasEmpresas.length.toLocaleString('pt-BR'),
                 duplicados: '0',
                 status: 'Consolidado'
             });
 
-            // Atualiza os contadores na tela de upload
-            document.getElementById('res-totais').innerText = dadosBrutos.length.toLocaleString('pt-BR');
-            document.getElementById('res-validos').innerText = dadosBrutos.length.toLocaleString('pt-BR');
+            document.getElementById('res-totais').innerText = novasEmpresas.length.toLocaleString('pt-BR');
+            document.getElementById('res-validos').innerText = novasEmpresas.length.toLocaleString('pt-BR');
             document.getElementById('res-duplicados').innerText = '0';
-            document.getElementById('res-novos').innerText = dadosBrutos.length.toLocaleString('pt-BR');
+            document.getElementById('res-novos').innerText = novasEmpresas.length.toLocaleString('pt-BR');
             document.getElementById('res-atualizados').innerText = '0';
             document.getElementById('upload-results-summary').style.display = 'block';
 
-            document.getElementById('status-base-header').innerText = `Base Ativa: ${nomeArquivo} (${dados.length} registros)`;
+            document.getElementById('status-base-header').innerText = `Base Ativa: ${nomeArquivo} (${novasEmpresas.length} registros)`;
 
-            // REPOPULA TODAS AS ABAS E O DASHBOARD COM OS DADOS REAIS DA PLANILHA
+            // REPOPULA TODA A APLICAÇÃO E O DASHBOARD COM OS NOVOS DADOS
             atualizarTudoNaTela();
 
-            alert(`Sucesso! ${dadosBrutos.length} registros foram extraídos de "${nomeArquivo}" e enriqueceram o Dashboard, a Busca e as Fila de BDR!`);
+            alert(`Sucesso! ${novasEmpresas.length} registros foram extraídos de "${nomeArquivo}" e atualizaram o Dashboard, a Busca e as Filas de BDR!`);
         }
 
         function cancelUploadSimulation() {
